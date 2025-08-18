@@ -36,11 +36,14 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   scroll_to_index: ^2.0.2
-  http_server: 1.0.0
-  carousel_slider: ^4.2.1
+  # http_server: 1.0.0  # Commented out - discontinued package
+  # carousel_slider: ^4.2.1  # Commented out due to compatibility issues
   url_launcher: ^6.1.14
   convert: ^3.1.1
   http: ^1.1.0
+  flutter_dotenv: ^5.1.0
+  visibility_detector: ^0.4.0+2
+  responsive_builder: ^0.7.1
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +67,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+  - .env
   - assets/background_test.jpg
   - assets/bti1.jpg
   - assets/bti2.jpg
