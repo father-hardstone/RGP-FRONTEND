@@ -1,17 +1,10 @@
 {
-  "buildCommand": "echo 'Using pre-built Flutter web app'",
+  "buildCommand": "flutter build web --release --dart-define=API_URL=$API_URL",
   "outputDirectory": "build/web",
-  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ],
   "headers": [
