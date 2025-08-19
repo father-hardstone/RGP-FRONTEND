@@ -1,13 +1,7 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class Config {
-  static String get backendApiUrl {
-    return dotenv.env['BACKEND_API_URL'] ?? 'http://localhost:5000';
-  }
-  
-  static String get enquiryEndpoint {
-    return dotenv.env['ENQUIRY_ENDPOINT'] ?? '/enquiry';
-  }
+  // Backend configuration (can be updated later if needed)
+  static const String backendApiUrl = 'http://localhost:5000';
+  static const String enquiryEndpoint = '/enquiry';
   
   static String get fullEnquiryUrl {
     return '$backendApiUrl$enquiryEndpoint';

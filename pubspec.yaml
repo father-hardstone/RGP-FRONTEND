@@ -41,7 +41,6 @@ dependencies:
   url_launcher: ^6.1.14
   convert: ^3.1.1
   http: ^1.1.0
-  flutter_dotenv: ^5.1.0
   visibility_detector: ^0.4.0+2
   responsive_builder: ^0.7.1
 
@@ -67,7 +66,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-  - .env
   - assets/background_test.jpg
   - assets/bti1.jpg
   - assets/bti2.jpg
