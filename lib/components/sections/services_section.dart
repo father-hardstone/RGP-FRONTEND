@@ -7,7 +7,12 @@ import 'package:responsive_builder/responsive_builder.dart';
 import 'package:rgp_landing_take_3/constants/responsive_breakpoints.dart';
 
 class ServicesSection extends StatefulWidget {
-  const ServicesSection({super.key});
+  final ScrollController? scrollController;
+  
+  const ServicesSection({
+    super.key,
+    this.scrollController,
+  });
 
   @override
   State<ServicesSection> createState() => _ServicesSectionState();
@@ -16,6 +21,7 @@ class ServicesSection extends StatefulWidget {
 class _ServicesSectionState extends State<ServicesSection> with TickerProviderStateMixin {
   bool _isVisible = false;
   bool _controllersInitialized = false;
+  bool _headingVisible = false;
   
   // Main animation controllers
   late AnimationController _backgroundController;
@@ -40,7 +46,7 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     );
     
     _headingController = AnimationController(
-      duration: const Duration(milliseconds: 120),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     
@@ -77,16 +83,23 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     
     _controllersInitialized = true;
     
-    // Start animations immediately after a short delay
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted && _controllersInitialized) {
-        _startAnimations();
-      }
-    });
+    // Add scroll listener if scrollController is provided
+    if (widget.scrollController != null) {
+      widget.scrollController!.addListener(_onScrollChanged);
+    }
+    
+    // Start with both heading and background hidden
+    _headingController.value = 0.0;
+    _backgroundController.value = 0.0;
   }
 
   @override
   void dispose() {
+    // Remove scroll listener
+    if (widget.scrollController != null) {
+      widget.scrollController!.removeListener(_onScrollChanged);
+    }
+    
     _backgroundController.dispose();
     _headingController.dispose();
     
@@ -98,26 +111,61 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     super.dispose();
   }
 
-  void _startAnimations() {
-    if (!mounted || !_controllersInitialized) return; // Safety check
+  void _onScrollChanged() {
+    if (!mounted || !_controllersInitialized) return;
     
-    // Start background animation first
-    _backgroundController.forward();
+    // Simple visibility detection based on scroll position
+    final scrollOffset = widget.scrollController!.offset;
     
-    // Start heading animation after background completes
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted && _controllersInitialized) {
+    // Consider section visible when scrolled past a certain point
+    // Adjust this value based on your layout
+    final isVisible = scrollOffset > 200; // Adjust this threshold
+    
+    // Debug output
+    print('Services Section - Scroll: $scrollOffset, Visible: $isVisible, Current: $_headingVisible');
+    
+    if (isVisible != _headingVisible) {
+      setState(() {
+        _headingVisible = isVisible;
+      });
+      
+      if (isVisible) {
+        print('Services Section - Fading IN heading and background');
         _headingController.forward();
+        _backgroundController.forward();
+        
+        // Start card animations when section becomes visible
+        _startCardAnimations();
+      } else {
+        print('Services Section - Fading OUT heading and background');
+        _headingController.reverse();
+        _backgroundController.reverse();
+        
+        // Reset card animations when section becomes invisible
+        _resetCardAnimations();
       }
-    });
+    }
+  }
+  
+  void _startCardAnimations() {
+    if (!_controllersInitialized || _cardAnimations.isEmpty) return;
     
-    // Start all card animations simultaneously with different durations
+    // Start all card animations with staggered timing
     for (int i = 0; i < _cardAnimations.length; i++) {
-      Future.delayed(Duration(milliseconds: 300 + (i * 100)), () { // Small stagger for visual separation
+      Future.delayed(Duration(milliseconds: 300 + (i * 150)), () {
         if (mounted && _controllersInitialized) {
           _cardAnimations[i].startAnimations();
         }
       });
+    }
+  }
+  
+  void _resetCardAnimations() {
+    if (!_controllersInitialized || _cardAnimations.isEmpty) return;
+    
+    // Reset all card animations so they can be triggered again
+    for (final animation in _cardAnimations) {
+      animation.resetAnimations();
     }
   }
 
@@ -151,7 +199,7 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
                         height: sectionHeight,
                         decoration: const BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/bti11.jpg'),
+                            image: AssetImage('assets/wallpaperflare.com_wallpaper (1).jpg'),
                             fit: BoxFit.cover,
                           ),
                         ),
