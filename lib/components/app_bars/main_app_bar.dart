@@ -91,19 +91,40 @@ class _MainAppBarState extends State<MainAppBar> with TickerProviderStateMixin {
                                 final screenWidth = MediaQuery.of(context).size.width;
                                 final displayText = screenWidth < 800 ? 'RGP' : 'RGP IT GLOBAL';
                                 
-                                return Text(
-                                  displayText,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSize,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 6,
-                                        color: Colors.black.withOpacity(0.7),
-                                        offset: const Offset(2, 2),
+                                return GestureDetector(
+                                  onTap: () {
+                                    // Scroll to top of the page
+                                    widget.scrollController.animateTo(
+                                      0,
+                                      duration: const Duration(milliseconds: 800),
+                                      curve: Curves.easeInOutCubic,
+                                    );
+                                  },
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4.0),
+                                        color: Colors.transparent,
                                       ),
-                                    ],
+                                      child: Text(
+                                        displayText,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: fontSize,
+                                          fontWeight: FontWeight.bold,
+                                          shadows: [
+                                            Shadow(
+                                              blurRadius: 6,
+                                              color: Colors.black.withOpacity(0.7),
+                                              offset: const Offset(2, 2),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 );
                               },
