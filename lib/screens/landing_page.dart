@@ -194,13 +194,17 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
                     ),
                     
                     // Services section
-                    const ServicesSection(),
+                    ServicesSection(
+                      scrollController: _scrollController,
+                    ),
                     
                     // Why choose us section
                     const WhyChooseUsSection(),
                     
                     // About us section
-                    const AboutUsSection(),
+                    AboutUsSection(
+                      scrollController: _scrollController,
+                    ),
                     
                     // Contact section
                     ContactSection(

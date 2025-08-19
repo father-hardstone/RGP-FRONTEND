@@ -3,15 +3,109 @@ import 'package:rgp_landing_take_3/components/sections/about_us_text_section.dar
 import 'package:rgp_landing_take_3/constants/typography.dart';
 
 class AboutUsSection extends StatefulWidget {
-  const AboutUsSection({super.key});
+  final ScrollController? scrollController;
+  
+  const AboutUsSection({
+    super.key,
+    this.scrollController,
+  });
 
   @override
   State<AboutUsSection> createState() => _AboutUsSectionState();
 }
 
-class _AboutUsSectionState extends State<AboutUsSection> {
+class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStateMixin {
+  bool _isVisible = false;
+  bool _animationsInitialized = false;
+  late AnimationController _imageZoomController;
+  late Animation<double> _imageZoomAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize image zoom animation controller with longer duration
+    _imageZoomController = AnimationController(
+      duration: const Duration(milliseconds: 1200), // Increased from 800ms for smoother feel
+      vsync: this,
+    );
+    
+    // Create zoom animation with sophisticated curve for natural movement
+    _imageZoomAnimation = Tween<double>(
+      begin: 1.2, // Zoomed in (zoomed out when scrolled away)
+      end: 1.0,   // Normal size (zoomed out when approached)
+    ).animate(CurvedAnimation(
+      parent: _imageZoomController,
+      curve: Curves.easeInOutBack, // Sophisticated curve for natural, smooth movement
+    ));
+    
+    // Add scroll listener if scrollController is provided
+    if (widget.scrollController != null) {
+      widget.scrollController!.addListener(_onScrollChanged);
+    }
+    
+    // Start with image zoomed in (zoomed out when scrolled away)
+    _imageZoomController.value = 1.0;
+    
+    // Mark animations as initialized
+    _animationsInitialized = true;
+  }
+  
+  void _onScrollChanged() {
+    if (!mounted || !_animationsInitialized) return;
+    
+    // Simple visibility detection based on scroll position
+    final scrollOffset = widget.scrollController!.offset;
+    
+    // Consider section visible when scrolled to About Us section
+    // Zoom out at 1534.7, zoom in at 3034.7
+    final isVisible = scrollOffset > 1534.7 && scrollOffset < 3034.7;
+    
+    if (isVisible != _isVisible) {
+      setState(() {
+        _isVisible = isVisible;
+      });
+      
+      if (isVisible) {
+        // Zoom out when approached (animate to 1.0) - gradually slow down
+        _imageZoomController.forward();
+      } else {
+        // Zoom in when scrolled away (animate to 1.2) - gradually speed up
+        _imageZoomController.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    // Remove scroll listener
+    if (widget.scrollController != null) {
+      widget.scrollController!.removeListener(_onScrollChanged);
+    }
+    
+    _imageZoomController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Show loading indicator if animations aren't ready yet
+    if (!_animationsInitialized) {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+          childCount: 1,
+        ),
+      );
+    }
+    
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
@@ -59,12 +153,22 @@ class _AboutUsSectionState extends State<AboutUsSection> {
         // Image section below text on mobile/tablet
         Expanded(
           flex: 2,
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: const AssetImage('assets/aup1.jpg'),
-                fit: BoxFit.cover,
-              ),
+          child: ClipRect(
+            child: AnimatedBuilder(
+              animation: _imageZoomAnimation, // Use the new animation
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _imageZoomAnimation.value,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: const AssetImage('assets/aup1.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -87,12 +191,22 @@ class _AboutUsSectionState extends State<AboutUsSection> {
         // Image section (50% width)
         Expanded(
           flex: 1,
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: const AssetImage('assets/aup1.jpg'),
-                fit: BoxFit.cover,
-              ),
+          child: ClipRect(
+            child: AnimatedBuilder(
+              animation: _imageZoomAnimation, // Use the new animation
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _imageZoomAnimation.value,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: const AssetImage('assets/aup1.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
