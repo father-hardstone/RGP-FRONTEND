@@ -8,11 +8,18 @@ class ScrollControllerHelper {
   double pl4 = 0; // About us section length
   double pl5 = 0; // Contact section length
   double pl6 = 0; // Additional section length
+  
+  // Reference to the landing page for safe scrolling
+  dynamic _landingPage;
 
   void initializeScrollController(ScrollController controller) {
     controller.addListener(() {
       // Add any scroll listener logic here if needed
     });
+  }
+  
+  void setLandingPage(dynamic landingPage) {
+    _landingPage = landingPage;
   }
 
   // Calculate page lengths based on screen dimensions
@@ -49,9 +56,7 @@ class ScrollControllerHelper {
     }
 
     // Why choose us section
-    if (width < threshold1) {
-      pl3 = 1200;
-    } else if (width < threshold3 && height < threshold2) {
+    if (width < threshold3 && height < threshold2) {
       pl3 = 600;
     } else if (width >= threshold3 && height < threshold2) {
       pl3 = 650;
@@ -71,6 +76,15 @@ class ScrollControllerHelper {
     // Contact section
     pl5 = 0.8 * height;
     pl6 = height;
+
+    // Debug output
+    print('Page lengths calculated:');
+    print('Screen: ${width}x${height}');
+    print('Hero (pl1): $pl1');
+    print('Services (pl2): $pl2');
+    print('Why Choose Us (pl3): $pl3');
+    print('About Us (pl4): $pl4');
+    print('Contact (pl5): $pl5');
   }
 
   // Scroll to specific section
@@ -78,20 +92,34 @@ class ScrollControllerHelper {
     double offset = 0;
     switch (sectionIndex) {
       case 1: // About Us
-        offset = pl1 + pl2 + pl3 + 10;
+        offset = pl1 + pl2 + pl3 - 150; // Further reduced offset for better positioning
         break;
       case 2: // Contact Us
         offset = pl1 + pl2 + pl3 + pl4 + pl5 + 20;
         break;
-      case 3: // Learn More (next section)
-        offset = pl1 + 45;
+      case 3: // Learn More (Our Services section)
+        offset = pl1 + 100; // Scroll past hero section to show services section clearly
         break;
     }
 
-    controller.animateTo(
-      offset,
-      duration: const Duration(milliseconds: 1000),
-      curve: Curves.easeInOut,
-    );
+    // Debug output
+    print('Scrolling to section $sectionIndex');
+    print('Page lengths: pl1=$pl1, pl2=$pl2, pl3=$pl3, pl4=$pl4, pl5=$pl5');
+    print('Calculated offset: $offset');
+    print('Current scroll position: ${controller.offset}');
+    print('Max scroll extent: ${controller.position.maxScrollExtent}');
+
+    // Use safe scrolling if available, otherwise fall back to standard
+    if (_landingPage != null && _landingPage.safeScrollTo != null) {
+      print('Using safe scroll method');
+      _landingPage.safeScrollTo(offset);
+    } else {
+      print('Using standard scroll method');
+      controller.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 1000),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 }

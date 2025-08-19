@@ -21,16 +21,15 @@ class AboutUsTextSection extends StatelessWidget {
           image: const AssetImage('assets/bti7.jpg'),
           fit: BoxFit.cover,
         ),
-        // No curved edges for background image
       ),
       child: Center(
-                  child: Padding(
-            padding: EdgeInsets.only(
-              left: isMobile ? 32.0 : 48.0,
-              right: isMobile ? 32.0 : 48.0,
-              top: isMobile ? 24.0 : 32.0,
-              bottom: isMobile ? 24.0 : 32.0,
-            ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: isMobile ? 32.0 : 48.0,
+            right: isMobile ? 32.0 : 48.0,
+            top: isMobile ? 24.0 : 32.0,
+            bottom: isMobile ? 24.0 : 32.0,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -44,7 +43,7 @@ class AboutUsTextSection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: isMobile ? 16 : 32), // Increased spacing for desktop
+              SizedBox(height: isMobile ? 16 : 32),
               // Sub-heading
               Text(
                 'Expert IT Solutions for Your Business',
@@ -54,8 +53,8 @@ class AboutUsTextSection extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: isMobile ? 24 : 40), // Increased spacing for desktop
-              // Body text
+              SizedBox(height: isMobile ? 24 : 40),
+              // Body text 1
               Text(
                 'At RGP IT Global, we are passionate about technology and its transformative power. Our team of expert consultants and developers work together to provide IT solutions that drive your business forward.',
                 style: TextStyle(
@@ -64,7 +63,8 @@ class AboutUsTextSection extends StatelessWidget {
                   height: 1.6,
                 ),
               ),
-              SizedBox(height: isMobile ? 16 : 24), // Increased spacing for desktop
+              SizedBox(height: isMobile ? 16 : 24),
+              // Body text 2
               Text(
                 'We understand that every business is unique, which is why we take the time to get to know your business and develop customized solutions that meet your specific needs and provide exponential growth.',
                 style: TextStyle(

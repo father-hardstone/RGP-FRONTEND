@@ -3,7 +3,6 @@ import 'package:rgp_landing_take_3/components/sections/service_card_new.dart';
 import 'package:rgp_landing_take_3/components/sections/services_card_animations.dart';
 import 'package:rgp_landing_take_3/components/sections/services_data.dart';
 import 'package:rgp_landing_take_3/constants/typography.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:rgp_landing_take_3/constants/responsive_breakpoints.dart';
 
@@ -77,6 +76,13 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     ));
     
     _controllersInitialized = true;
+    
+    // Start animations immediately after a short delay
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted && _controllersInitialized) {
+        _startAnimations();
+      }
+    });
   }
 
   @override
@@ -92,52 +98,26 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     super.dispose();
   }
 
-  void _onVisibilityChanged(VisibilityInfo info) {
-    if (info.visibleFraction > 0.01) {
-      if (!_isVisible) {
-        setState(() {
-          _isVisible = true;
-        });
-        _startAnimations();
-      }
-    } else {
-      if (_isVisible) {
-        setState(() {
-          _isVisible = false;
-        });
-        _stopAnimations();
-      }
-    }
-  }
-
   void _startAnimations() {
+    if (!mounted || !_controllersInitialized) return; // Safety check
+    
     // Start background animation first
     _backgroundController.forward();
     
     // Start heading animation after background completes
     Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted && _isVisible) {
+      if (mounted && _controllersInitialized) {
         _headingController.forward();
       }
     });
     
-    // Start card animations with staggered timing
+    // Start all card animations simultaneously with different durations
     for (int i = 0; i < _cardAnimations.length; i++) {
-      Future.delayed(Duration(milliseconds: 270 + (i * 50)), () {
-        if (mounted && _isVisible) {
+      Future.delayed(Duration(milliseconds: 300 + (i * 100)), () { // Small stagger for visual separation
+        if (mounted && _controllersInitialized) {
           _cardAnimations[i].startAnimations();
         }
       });
-    }
-  }
-
-  void _stopAnimations() {
-    _backgroundController.reset();
-    _headingController.reset();
-    
-    // Reset card animations
-    for (final animation in _cardAnimations) {
-      animation.resetAnimations();
     }
   }
 
@@ -159,65 +139,61 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
               final double sectionHeight = _calculateSectionHeight(width, height, isMobile);
               final double headingSize = TypographyConstants.getHeadingSize(width);
 
-              return VisibilityDetector(
-                key: const Key('services_section'),
-                onVisibilityChanged: _onVisibilityChanged,
-                child: AnimatedBuilder(
-                  animation: _backgroundController,
-                  builder: (context, child) {
-                    return SlideTransition(
-                      position: _backgroundSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _backgroundFadeAnimation,
-                        child: Container(
-                          width: width,
-                          height: sectionHeight,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/bti11.jpg'),
-                              fit: BoxFit.cover,
-                            ),
+              return AnimatedBuilder(
+                animation: _backgroundController,
+                builder: (context, child) {
+                  return SlideTransition(
+                    position: _backgroundSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _backgroundFadeAnimation,
+                      child: Container(
+                        width: width,
+                        height: sectionHeight,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/bti11.jpg'),
+                            fit: BoxFit.cover,
                           ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.4),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // Top spacing
-                                SizedBox(height: isMobile ? sectionHeight * 0.05 : sectionHeight * 0.06),
-                                
-                                // Section heading with fade-in effect
-                                FadeTransition(
-                                  opacity: _headingFadeAnimation,
-                                  child: Text(
-                                    'Our Services',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: headingSize,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.4),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Top spacing
+                              SizedBox(height: isMobile ? sectionHeight * 0.05 : sectionHeight * 0.06),
+                              
+                              // Section heading with fade-in effect
+                              FadeTransition(
+                                opacity: _headingFadeAnimation,
+                                child: Text(
+                                  'Our Services',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: headingSize,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                
-                                // Middle spacing
-                                SizedBox(height: isMobile ? sectionHeight * 0.04 : sectionHeight * 0.05),
-                                
-                                // Services layout
-                                _buildServicesLayout(width, sectionHeight, isMobile),
-                                
-                                // Bottom spacing
-                                SizedBox(height: isMobile ? sectionHeight * 0.01 : sectionHeight * 0.015),
-                              ],
-                            ),
+                              ),
+                              
+                              // Middle spacing
+                              SizedBox(height: isMobile ? sectionHeight * 0.04 : sectionHeight * 0.05),
+                              
+                              // Services layout
+                              _buildServicesLayout(width, sectionHeight, isMobile),
+                              
+                              // Bottom spacing
+                              SizedBox(height: isMobile ? sectionHeight * 0.01 : sectionHeight * 0.015),
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -228,6 +204,16 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
   }
 
   Widget _buildServicesLayout(double width, double sectionHeight, bool isMobile) {
+    // Guard against accessing animations before they're initialized
+    if (!_controllersInitialized || _cardAnimations.isEmpty) {
+      return Container(
+        height: sectionHeight * 0.7,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     if (ResponsiveBreakpoints.isSmall(width)) {
       // Mobile and Tablet layout - vertical stacking
       return Container(
@@ -241,21 +227,27 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
               final service = entry.value;
               
               return Flexible(
-                child: FadeTransition(
-                  opacity: _cardAnimations[index].cardFadeAnimation,
-                  child: ServiceCardNew(
-                    title: service.title,
-                    description: service.description,
-                    imagePath: service.imagePath,
-                    onDetailsPressed: () {
-                      // Navigate to service page
-                    },
-                    isMobile: true,
-                    imageFadeAnimation: _cardAnimations[index].imageFadeAnimation,
-                    imageScaleAnimation: _cardAnimations[index].imageScaleAnimation,
-                    titleFadeAnimation: _cardAnimations[index].titleFadeAnimation,
-                    textFadeAnimation: _cardAnimations[index].textFadeAnimation,
-                    buttonFadeAnimation: _cardAnimations[index].buttonFadeAnimation,
+                child: SlideTransition(
+                  position: _cardAnimations[index].cardSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _cardAnimations[index].cardFadeAnimation,
+                    child: ServiceCardNew(
+                      title: service.title,
+                      description: service.description,
+                      imagePath: service.imagePath,
+                      onDetailsPressed: () {
+                        // Navigate to service page
+                      },
+                      isMobile: true,
+                      imageFadeAnimation: _cardAnimations[index].imageFadeAnimation,
+                      imageScaleAnimation: _cardAnimations[index].imageScaleAnimation,
+                      titleFadeAnimation: _cardAnimations[index].titleFadeAnimation,
+                      titleSlideAnimation: _cardAnimations[index].titleSlideAnimation,
+                      textFadeAnimation: _cardAnimations[index].textFadeAnimation,
+                      textSlideAnimation: _cardAnimations[index].textSlideAnimation,
+                      buttonFadeAnimation: _cardAnimations[index].buttonFadeAnimation,
+                      buttonSlideAnimation: _cardAnimations[index].buttonSlideAnimation,
+                    ),
                   ),
                 ),
               );
@@ -274,21 +266,27 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
               final service = entry.value;
               
               return Expanded(
-                child: FadeTransition(
-                  opacity: _cardAnimations[index].cardFadeAnimation,
-                  child: ServiceCardNew(
-                    title: service.title,
-                    description: service.description,
-                    imagePath: service.imagePath,
-                    onDetailsPressed: () {
-                      // Navigate to service page
-                    },
-                    isMobile: false,
-                    imageFadeAnimation: _cardAnimations[index].imageFadeAnimation,
-                    imageScaleAnimation: _cardAnimations[index].imageScaleAnimation,
-                    titleFadeAnimation: _cardAnimations[index].titleFadeAnimation,
-                    textFadeAnimation: _cardAnimations[index].textFadeAnimation,
-                    buttonFadeAnimation: _cardAnimations[index].buttonFadeAnimation,
+                child: SlideTransition(
+                  position: _cardAnimations[index].cardSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _cardAnimations[index].cardFadeAnimation,
+                    child: ServiceCardNew(
+                      title: service.title,
+                      description: service.description,
+                      imagePath: service.imagePath,
+                      onDetailsPressed: () {
+                        // Navigate to service page
+                      },
+                      isMobile: false,
+                      imageFadeAnimation: _cardAnimations[index].imageFadeAnimation,
+                      imageScaleAnimation: _cardAnimations[index].imageScaleAnimation,
+                      titleFadeAnimation: _cardAnimations[index].titleFadeAnimation,
+                      titleSlideAnimation: _cardAnimations[index].titleSlideAnimation,
+                      textFadeAnimation: _cardAnimations[index].textFadeAnimation,
+                      textSlideAnimation: _cardAnimations[index].textSlideAnimation,
+                      buttonFadeAnimation: _cardAnimations[index].buttonFadeAnimation,
+                      buttonSlideAnimation: _cardAnimations[index].buttonSlideAnimation,
+                    ),
                   ),
                 ),
               );
@@ -303,7 +301,7 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     if (ResponsiveBreakpoints.isMobile(width)) {
       return height * 1.9;
     } else if (ResponsiveBreakpoints.isTablet(width)) {
-      return height * 1.1;
+      return height * 1.4; // Increased from 1.1 to 1.4 to accommodate taller cards
     } else if (ResponsiveBreakpoints.isDesktop(width)) {
       return height * 1.0;
     } else {

@@ -287,6 +287,7 @@ class _WhyChooseUsSectionState extends State<WhyChooseUsSection>
 	) {
 		Widget stat(int index, String number, String label) {
 			return Column(
+				mainAxisSize: MainAxisSize.min,
 				children: [
 					// Number with typing effect and blinking cursor
 					Row(
@@ -324,9 +325,12 @@ class _WhyChooseUsSectionState extends State<WhyChooseUsSection>
 							offset: _subtextVisible ? Offset.zero : const Offset(0, -0.1),
 							duration: const Duration(milliseconds: 250),
 							curve: Curves.easeOut,
-							child: SizedBox(
-								height: isMobile ? sectionHeight * 0.1 : sectionHeight * 0.3,
+							child: Container(
 								width: isMobile ? width * 0.8 : width * 0.2,
+								padding: EdgeInsets.symmetric(
+									horizontal: isMobile ? 8.0 : 4.0,
+									vertical: isMobile ? 8.0 : 4.0,
+								),
 								child: Text(
 									label,
 									textAlign: TextAlign.center,
@@ -339,7 +343,7 @@ class _WhyChooseUsSectionState extends State<WhyChooseUsSection>
 						),
 					),
 					
-					SizedBox(height: isMobile ? sectionHeight * 0.015 : sectionHeight * 0.02),
+					SizedBox(height: isMobile ? 16.0 : 24.0),
 				],
 			);
 		}

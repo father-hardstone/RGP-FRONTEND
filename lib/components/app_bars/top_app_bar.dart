@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:rgp_landing_take_3/utils/scroll_controller.dart';
 
 class TopAppBar extends StatelessWidget {
-  const TopAppBar({super.key});
+  final ScrollController scrollController;
+  final ScrollControllerHelper scrollHelper;
+
+  const TopAppBar({
+    super.key,
+    required this.scrollController,
+    required this.scrollHelper,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,8 @@ class TopAppBar extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    // About Us button - will be handled by parent
+                    // Scroll to About Us section
+                    scrollHelper.scrollToSection(scrollController, 1);
                   },
                   child: const Text(
                     'About Us',

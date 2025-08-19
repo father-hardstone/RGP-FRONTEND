@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:rgp_landing_take_3/components/sections/about_us_text_section.dart';
-import 'package:rgp_landing_take_3/components/sections/about_us_image_section.dart';
 import 'package:rgp_landing_take_3/constants/typography.dart';
 
-class AboutUsSection extends StatelessWidget {
+class AboutUsSection extends StatefulWidget {
   const AboutUsSection({super.key});
 
+  @override
+  State<AboutUsSection> createState() => _AboutUsSectionState();
+}
+
+class _AboutUsSectionState extends State<AboutUsSection> {
   @override
   Widget build(BuildContext context) {
     return SliverList(
@@ -28,7 +32,7 @@ class AboutUsSection extends StatelessWidget {
               return Container(
                 width: width,
                 height: sectionHeight,
-                child: isMobile
+                child: isMobile || isTablet
                     ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
                     : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
               );
@@ -43,21 +47,25 @@ class AboutUsSection extends StatelessWidget {
   Widget _buildMobileLayout(double width, double height, double textSize, double headingSize) {
     return Column(
       children: [
-        // Text section with background - make it taller on mobile
+        // Text section with background
         Expanded(
-          flex: 8, // Increased from 7 to 8 for even more height
+          flex: 8,
           child: AboutUsTextSection(
             textSize: textSize,
             headingSize: headingSize,
             isMobile: true,
           ),
         ),
-        // Image section - reduced height slightly
+        // Image section below text on mobile/tablet
         Expanded(
-          flex: 2, // Reduced from 3 to 2
-          child: AboutUsImageSection(
-            imagePath: 'assets/aup1.jpg',
-            isMobile: true,
+          flex: 2,
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: const AssetImage('assets/aup1.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
       ],
@@ -79,9 +87,13 @@ class AboutUsSection extends StatelessWidget {
         // Image section (50% width)
         Expanded(
           flex: 1,
-          child: AboutUsImageSection(
-            imagePath: 'assets/aup1.jpg',
-            isMobile: false,
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: const AssetImage('assets/aup1.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
       ],
@@ -90,7 +102,7 @@ class AboutUsSection extends StatelessWidget {
 
   double _calculateSectionHeight(double width, double height, bool isMobile) {
     if (isMobile) {
-      return height * 1.1; // Increased from 0.95 to 1.1 for even more mobile height
+      return height * 1.1;
     } else if (width < 1200) {
       return height * 0.8;
     } else {

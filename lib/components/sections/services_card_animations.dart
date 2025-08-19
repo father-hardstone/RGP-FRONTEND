@@ -10,11 +10,15 @@ class ServicesCardAnimations {
   
   // Animations for each card
   late Animation<double> cardFadeAnimation;
+  late Animation<Offset> cardSlideAnimation;
   late Animation<double> imageFadeAnimation;
   late Animation<double> imageScaleAnimation;
   late Animation<double> titleFadeAnimation;
+  late Animation<Offset> titleSlideAnimation;
   late Animation<double> textFadeAnimation;
+  late Animation<Offset> textSlideAnimation;
   late Animation<double> buttonFadeAnimation;
+  late Animation<Offset> buttonSlideAnimation;
   
   ServicesCardAnimations({
     required TickerProvider vsync,
@@ -25,31 +29,38 @@ class ServicesCardAnimations {
   }
   
   void _initializeControllers(TickerProvider vsync, int cardIndex) {
-    // Stagger the card appearance based on index
-    final int cardDelay = cardIndex * 50; // 50ms delay between cards
+    // Progressive duration increase: top-left = fast, bottom-right = slow
+    // Reduced 200ms from each base duration for snappier feel
+    final int cardIndexDeltaMs = cardIndex * 300; // +300ms per subsequent card
+
+    final int cardMs = 1000 + cardIndexDeltaMs;      // Base: 1000ms, then 1300ms, 1600ms
+    final int imageMs = 1050 + cardIndexDeltaMs;     // Base: 1050ms, then 1350ms, 1650ms
+    final int titleMs = 1100 + cardIndexDeltaMs;     // Base: 1100ms, then 1400ms, 1700ms
+    final int textMs = 1150 + cardIndexDeltaMs;      // Base: 1150ms, then 1450ms, 1750ms
+    final int buttonMs = 1200 + cardIndexDeltaMs;    // Base: 1200ms, then 1500ms, 1800ms
     
     cardController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: Duration(milliseconds: cardMs),
       vsync: vsync,
     );
     
     imageController = AnimationController(
-      duration: const Duration(milliseconds: 150),
+      duration: Duration(milliseconds: imageMs),
       vsync: vsync,
     );
     
     titleController = AnimationController(
-      duration: const Duration(milliseconds: 120),
+      duration: Duration(milliseconds: titleMs),
       vsync: vsync,
     );
     
     textController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: Duration(milliseconds: textMs),
       vsync: vsync,
     );
     
     buttonController = AnimationController(
-      duration: const Duration(milliseconds: 80),
+      duration: Duration(milliseconds: buttonMs),
       vsync: vsync,
     );
   }
@@ -58,6 +69,14 @@ class ServicesCardAnimations {
     cardFadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: cardController,
+      curve: Curves.easeOut,
+    ));
+    
+    cardSlideAnimation = Tween<Offset>(
+      begin: const Offset(-0.08, 0.0),
+      end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: cardController,
       curve: Curves.easeOut,
@@ -72,8 +91,8 @@ class ServicesCardAnimations {
     ));
     
     imageScaleAnimation = Tween<double>(
-      begin: 1.2, // Start 20% larger
-      end: 1.0, // End at normal size
+      begin: 1.2,
+      end: 1.0,
     ).animate(CurvedAnimation(
       parent: imageController,
       curve: Curves.easeOut,
@@ -87,9 +106,25 @@ class ServicesCardAnimations {
       curve: Curves.easeOut,
     ));
     
+    titleSlideAnimation = Tween<Offset>(
+      begin: const Offset(-0.05, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: titleController,
+      curve: Curves.easeOut,
+    ));
+    
     textFadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: textController,
+      curve: Curves.easeOut,
+    ));
+    
+    textSlideAnimation = Tween<Offset>(
+      begin: const Offset(-0.04, 0.0),
+      end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: textController,
       curve: Curves.easeOut,
@@ -102,27 +137,23 @@ class ServicesCardAnimations {
       parent: buttonController,
       curve: Curves.easeOut,
     ));
+    
+    buttonSlideAnimation = Tween<Offset>(
+      begin: const Offset(-0.03, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: buttonController,
+      curve: Curves.easeOut,
+    ));
   }
   
   void startAnimations() {
-    // Start card container animation
+    // All animations start simultaneously but with different durations
     cardController.forward();
-    
-    // Start image animation immediately
     imageController.forward();
-    
-    // Stagger the other elements
-    Future.delayed(const Duration(milliseconds: 100), () {
-      titleController.forward();
-    });
-    
-    Future.delayed(const Duration(milliseconds: 200), () {
-      textController.forward();
-    });
-    
-    Future.delayed(const Duration(milliseconds: 300), () {
-      buttonController.forward();
-    });
+    titleController.forward();
+    textController.forward();
+    buttonController.forward();
   }
   
   void resetAnimations() {
