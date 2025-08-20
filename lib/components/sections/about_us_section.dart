@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rgp_landing_take_3/components/sections/about_us_text_section.dart';
 import 'package:rgp_landing_take_3/constants/typography.dart';
+import 'package:rgp_landing_take_3/constants/responsive_breakpoints.dart';
 
 class AboutUsSection extends StatefulWidget {
   final ScrollController? scrollController;
@@ -19,24 +20,24 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
   bool _animationsInitialized = false;
   late AnimationController _imageZoomController;
   late Animation<double> _imageZoomAnimation;
-  
+
   @override
   void initState() {
     super.initState();
     
-    // Initialize image zoom animation controller with longer duration
+    // Initialize image zoom animation controller
     _imageZoomController = AnimationController(
-      duration: const Duration(milliseconds: 1200), // Increased from 800ms for smoother feel
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     
-    // Create zoom animation with sophisticated curve for natural movement
+    // Create zoom animation (zoom out when visible, zoom in when not)
     _imageZoomAnimation = Tween<double>(
       begin: 1.2, // Zoomed in (zoomed out when scrolled away)
       end: 1.0,   // Normal size (zoomed out when approached)
     ).animate(CurvedAnimation(
       parent: _imageZoomController,
-      curve: Curves.easeInOutBack, // Sophisticated curve for natural, smooth movement
+      curve: Curves.easeInOutCubic,
     ));
     
     // Add scroll listener if scrollController is provided
@@ -67,10 +68,10 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
       });
       
       if (isVisible) {
-        // Zoom out when approached (animate to 1.0) - gradually slow down
+        // Zoom out when approached (animate to 1.0)
         _imageZoomController.forward();
       } else {
-        // Zoom in when scrolled away (animate to 1.2) - gradually speed up
+        // Zoom in when scrolled away (animate to 1.2)
         _imageZoomController.reverse();
       }
     }
@@ -105,32 +106,33 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
         ),
       );
     }
-    
+
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return LayoutBuilder(
-            builder: (context, constraints) {
-              final double width = constraints.maxWidth;
-              final double height = MediaQuery.of(context).size.height;
-              
-              // Responsive breakpoints
-              final bool isMobile = width < 768;
-              final bool isTablet = width >= 768 && width < 1200;
-              
-              // Calculate responsive dimensions
-              final double sectionHeight = _calculateSectionHeight(width, height, isMobile);
-              final double textSize = _calculateTextSize(width, isMobile);
-              final double headingSize = _calculateHeadingSize(width, isMobile);
+              builder: (context, constraints) {
+                final double width = constraints.maxWidth;
+                final double height = MediaQuery.of(context).size.height;
+                
+                // Responsive breakpoints
+              final bool isMobile = ResponsiveBreakpoints.isMobile(width);
+              final bool isTablet = ResponsiveBreakpoints.isTablet(width);
+              final bool isDesktop = ResponsiveBreakpoints.isDesktop(width);
+                
+                // Calculate responsive dimensions
+                final double sectionHeight = _calculateSectionHeight(width, height, isMobile);
+                final double textSize = _calculateTextSize(width, isMobile);
+                final double headingSize = _calculateHeadingSize(width, isMobile);
 
-              return Container(
-                width: width,
-                height: sectionHeight,
-                child: isMobile || isTablet
-                    ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
-                    : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
-              );
-            },
+                return Container(
+                  width: width,
+                  height: sectionHeight,
+                child: ResponsiveBreakpoints.isSmall(width)
+                      ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
+                      : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
+                );
+              },
           );
         },
         childCount: 1,
@@ -155,7 +157,7 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
           flex: 2,
           child: ClipRect(
             child: AnimatedBuilder(
-              animation: _imageZoomAnimation, // Use the new animation
+              animation: _imageZoomAnimation,
               builder: (context, child) {
                 return Transform.scale(
                   scale: _imageZoomAnimation.value,
@@ -193,7 +195,7 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
           flex: 1,
           child: ClipRect(
             child: AnimatedBuilder(
-              animation: _imageZoomAnimation, // Use the new animation
+              animation: _imageZoomAnimation,
               builder: (context, child) {
                 return Transform.scale(
                   scale: _imageZoomAnimation.value,
