@@ -89,23 +89,41 @@ class ScrollControllerHelper {
 
   // Scroll to specific section
   void scrollToSection(ScrollController controller, int sectionIndex) {
+    // Use dynamic positioning for better accuracy across different screen sizes
+    scrollToSectionDynamic(controller, sectionIndex);
+    
+    // Get the calculated offset from the dynamic method
     double offset = 0;
-    switch (sectionIndex) {
-      case 1: // About Us
-        // Use the precise About Us section position for perfect alignment
-        // Based on terminal output showing About Us at ~2312px
-        // pl1 + pl2 + pl3 = 877.68 + 954 + 667.8 = 2499.48
-        // Target: 2312px, so we need: 2499.48 - 187.48 = 2312
-        offset = pl1 + pl2 + pl3 - 187; // Precise offset to reach 2312px
-        break;
-      case 2: // Contact Us
-        offset = pl1 + pl2 + pl3 + pl4 + pl5 + 20;
-        break;
-      case 3: // Learn More (Our Services section)
-        // Use the precise services section position for perfect alignment
-        // Based on terminal output showing services at ~956px
-        offset = pl1 + 80; // Add small offset to account for any spacing/margins
-        break;
+    final context = _landingPage?.context;
+    if (context != null) {
+      final size = MediaQuery.of(context).size;
+      final screenHeight = size.height;
+      final double responsiveOffset = screenHeight * 0.1;
+      
+      switch (sectionIndex) {
+        case 1: // About Us
+          offset = pl1 + pl2 + pl3 - responsiveOffset;
+          break;
+        case 2: // Contact Us
+          offset = pl1 + pl2 + pl3 + pl4 - responsiveOffset;
+          break;
+        case 3: // Learn More (Our Services section)
+          offset = pl1 + (responsiveOffset * 0.5);
+          break;
+      }
+    } else {
+      // Fallback calculation
+      switch (sectionIndex) {
+        case 1: // About Us
+          offset = pl1 + pl2 + pl3 - 100;
+          break;
+        case 2: // Contact Us
+          offset = pl1 + pl2 + pl3 + pl4 - 100;
+          break;
+        case 3: // Learn More (Our Services section)
+          offset = pl1 + 50;
+          break;
+      }
     }
 
     // Debug output
@@ -126,6 +144,49 @@ class ScrollControllerHelper {
         duration: const Duration(milliseconds: 1000),
         curve: Curves.easeInOut,
       );
+    }
+  }
+
+  // Dynamic section positioning with better calculations
+  void scrollToSectionDynamic(ScrollController controller, int sectionIndex) {
+    double offset = 0;
+    
+    // Get current screen dimensions for better positioning
+    final context = _landingPage?.context;
+    if (context != null) {
+      final size = MediaQuery.of(context).size;
+      final screenHeight = size.height;
+      
+      // Calculate responsive offsets based on screen size
+      final double responsiveOffset = screenHeight * 0.1; // 10% of screen height
+      
+      switch (sectionIndex) {
+        case 1: // About Us
+          // Dynamic calculation with responsive offset
+          offset = pl1 + pl2 + pl3 - responsiveOffset;
+          break;
+        case 2: // Contact Us
+          // Dynamic calculation with responsive offset
+          offset = pl1 + pl2 + pl3 + pl4 - responsiveOffset;
+          break;
+        case 3: // Learn More (Our Services section)
+          // Dynamic calculation with responsive offset
+          offset = pl1 + (responsiveOffset * 0.5); // Smaller offset for services
+          break;
+      }
+    } else {
+      // Fallback to static calculation if context not available
+      switch (sectionIndex) {
+        case 1: // About Us
+          offset = pl1 + pl2 + pl3 - 100;
+          break;
+        case 2: // Contact Us
+          offset = pl1 + pl2 + pl3 + pl4 - 100;
+          break;
+        case 3: // Learn More (Our Services section)
+          offset = pl1 + 50;
+          break;
+      }
     }
   }
 }
