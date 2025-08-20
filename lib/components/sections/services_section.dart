@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rgp_landing_take_3/components/sections/service_card_new.dart';
 import 'package:rgp_landing_take_3/components/sections/services_card_animations.dart';
@@ -26,6 +27,7 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
   // Main animation controllers
   late AnimationController _backgroundController;
   late AnimationController _headingController;
+  late AnimationController _gradientController; // For northern lights effect
   
   // Card animations (managed by helper class)
   late List<ServicesCardAnimations> _cardAnimations;
@@ -49,6 +51,12 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
+    
+    // Initialize gradient controller for northern lights effect
+    _gradientController = AnimationController(
+      duration: const Duration(seconds: 8), // 8-second sweep
+      vsync: this,
+    )..repeat(); // Continuous northern lights effect
     
     // Initialize card animations using helper class
     _cardAnimations = List.generate(
@@ -88,9 +96,11 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
       widget.scrollController!.addListener(_onScrollChanged);
     }
     
-    // Start with both heading and background hidden
+    // Start background animation immediately
+    _backgroundController.forward();
+    
+    // Start with heading hidden
     _headingController.value = 0.0;
-    _backgroundController.value = 0.0;
   }
 
   @override
@@ -102,6 +112,7 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
     
     _backgroundController.dispose();
     _headingController.dispose();
+    _gradientController.dispose(); // Dispose gradient controller
     
     // Dispose card animations
     for (final animation in _cardAnimations) {
@@ -207,34 +218,70 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.4),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          child: Stack(
                             children: [
-                              // Top spacing
-                              SizedBox(height: isMobile ? sectionHeight * 0.05 : sectionHeight * 0.06),
-                              
-                              // Section heading with fade-in effect
-                              FadeTransition(
-                                opacity: _headingFadeAnimation,
-                                child: Text(
-                                  'Our Services',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: headingSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                              // Northern lights overlay effect
+                              Positioned.fill(
+                                child: _controllersInitialized 
+                                  ? AnimatedBuilder(
+                                      animation: _gradientController,
+                                      builder: (context, child) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                Color(0xFF143877).withOpacity(0.15), // Subtle blue
+                                                Color(0xFF1A4A8F).withOpacity(0.25), // Medium blue
+                                                Color(0xFF143877).withOpacity(0.15), // Subtle blue
+                                              ],
+                                              stops: [0.2, 0.5, 0.8],
+                                              transform: GradientRotation(
+                                                _gradientController.value * 2 * 3.14159, // Full rotation
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF143877).withOpacity(0.2), // Fallback static overlay
+                                      ),
+                                    ),
                               ),
-                              
-                              // Middle spacing
-                              SizedBox(height: isMobile ? sectionHeight * 0.04 : sectionHeight * 0.05),
-                              
-                              // Services layout
-                              _buildServicesLayout(width, sectionHeight, isMobile),
-                              
-                              // Bottom spacing
-                              SizedBox(height: isMobile ? sectionHeight * 0.01 : sectionHeight * 0.015),
+                              // Content on top of the spinning overlay
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Top spacing
+                                  SizedBox(height: isMobile ? sectionHeight * 0.05 : sectionHeight * 0.06),
+                                  
+                                  // Section heading with fade-in effect
+                                  FadeTransition(
+                                    opacity: _headingFadeAnimation,
+                                    child: Text(
+                                      'Our Services',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: headingSize,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  // Middle spacing
+                                  SizedBox(height: isMobile ? sectionHeight * 0.04 : sectionHeight * 0.05),
+                                  
+                                  // Services layout
+                                  _buildServicesLayout(width, sectionHeight, isMobile),
+                                  
+                                  // Bottom spacing
+                                  SizedBox(height: isMobile ? sectionHeight * 0.01 : sectionHeight * 0.015),
+                                ],
+                              ),
                             ],
                           ),
                         ),

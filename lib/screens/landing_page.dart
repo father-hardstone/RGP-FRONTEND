@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rgp_landing_take_3/components/app_bars/top_app_bar.dart';
 import 'package:rgp_landing_take_3/components/app_bars/main_app_bar.dart';
 import 'package:rgp_landing_take_3/components/sections/hero_section.dart';
 import 'package:rgp_landing_take_3/components/sections/services_section.dart';
@@ -175,12 +174,6 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
                   slivers: <Widget>[
-                    // Top app bar (thin black bar)
-                    TopAppBar(
-                      scrollController: _scrollController,
-                      scrollHelper: _scrollHelper,
-                    ),
-                    
                     // Main app bar (blue bar with title and contact button)
                     MainAppBar(
                       scrollController: _scrollController,
@@ -207,10 +200,9 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
                     ),
                     
                     // Contact section
-                    ContactSection(
-                      scrollController: _scrollController,
-                      scrollHelper: _scrollHelper,
-                    ),
+                                          ContactSection(
+                        scrollController: _scrollController,
+                      ),
                   ],
                 ),
               );
