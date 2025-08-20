@@ -59,14 +59,19 @@ class _MainAppBarState extends State<MainAppBar> with TickerProviderStateMixin {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      Color(0xFF143877).withOpacity(0.35), // Slightly more visible
-                      Color(0xFF1A4A8F).withOpacity(0.45), // More visible sweep effect
-                      Color(0xFF143877).withOpacity(0.35), // Slightly more visible
+                      Color(0xFF143877).withOpacity(0.23), // Made lighter (increased from 0.15)
+                      Color(0xFF1A4A8F).withOpacity(0.29), // Made darker (reduced from 0.65)
+                      Color(0xFF1A4A8F).withOpacity(0.30), // Made darker (reduced from 0.65)
+                      Color(0xFF1A4A8F).withOpacity(0.29), // Made darker (reduced from 0.65)
+                      Color(0xFF143877).withOpacity(0.23), // Made lighter (increased from 0.15)
+                      
                     ],
                     stops: [
-                      0.2,
-                      0.5,
-                      0.8,
+                      0.05, // Moved from 0.2 - expand lighter end
+                      0.2,  // Keep center
+                      0.4,  // Keep center
+                      0.6,  // Keep center
+                      0.95, // Moved from 0.8 - expand lighter end
                     ],
                     // Apply a shifting transform to simulate sweep
                     transform: GradientRotation(

@@ -20,7 +20,7 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
   bool _animationsInitialized = false;
   late AnimationController _imageZoomController;
   late Animation<double> _imageZoomAnimation;
-  
+
   @override
   void initState() {
     super.initState();
@@ -106,33 +106,33 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
         ),
       );
     }
-    
+
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return LayoutBuilder(
-            builder: (context, constraints) {
-              final double width = constraints.maxWidth;
-              final double height = MediaQuery.of(context).size.height;
-              
-              // Responsive breakpoints
+              builder: (context, constraints) {
+                final double width = constraints.maxWidth;
+                final double height = MediaQuery.of(context).size.height;
+                
+                // Responsive breakpoints
               final bool isMobile = ResponsiveBreakpoints.isMobile(width);
               final bool isTablet = ResponsiveBreakpoints.isTablet(width);
               final bool isDesktop = ResponsiveBreakpoints.isDesktop(width);
-              
-              // Calculate responsive dimensions
-              final double sectionHeight = _calculateSectionHeight(width, height, isMobile);
-              final double textSize = _calculateTextSize(width, isMobile);
-              final double headingSize = _calculateHeadingSize(width, isMobile);
+                
+                // Calculate responsive dimensions
+                final double sectionHeight = _calculateSectionHeight(width, height, isMobile);
+                final double textSize = _calculateTextSize(width, isMobile);
+                final double headingSize = _calculateHeadingSize(width, isMobile);
 
-              return Container(
-                width: width,
-                height: sectionHeight,
+                return Container(
+                  width: width,
+                  height: sectionHeight,
                 child: ResponsiveBreakpoints.isSmall(width)
-                    ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
-                    : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
-              );
-            },
+                      ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
+                      : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
+                );
+              },
           );
         },
         childCount: 1,

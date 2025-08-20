@@ -63,81 +63,118 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
               return Container(
                 width: width,
                 height: sectionHeight,
-                child: Column(
+                child: Stack(
                   children: [
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          // Background with northern lights effect
-                          Positioned.fill(
-                            child: _animationsInitialized 
-                              ? AnimatedBuilder(
-                                  animation: _gradientController,
-                                  builder: (context, child) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Color(0xFF143877).withOpacity(0.35), // Blue at top
-                                            Color(0xFF1A4A8F).withOpacity(0.45), // Lighter blue in middle
-                                            Color(0xFF143877).withOpacity(0.35), // Blue
-                                            Color(0xFF143877).withOpacity(0.2), // Fading out
-                                            Color(0xFF143877).withOpacity(0.1), // More faded
-                                            Colors.transparent, // Completely transparent at bottom
-                                          ],
-                                          stops: [0.0, 0.3, 0.6, 0.8, 0.9, 1.0],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                )
-                              : Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Color(0xFF143877).withOpacity(0.4), // Blue at top
-                                        Color(0xFF143877).withOpacity(0.3), // Fading
-                                        Color(0xFF143877).withOpacity(0.2), // More faded
-                                        Color(0xFF143877).withOpacity(0.1), // Very faded
-                                        Colors.transparent, // Completely transparent at bottom
-                                      ],
-                                      stops: [0.0, 0.4, 0.7, 0.9, 1.0],
+                    // Background with northern lights effect (covers entire section)
+                    Positioned.fill(
+                      child: _animationsInitialized 
+                        ? AnimatedBuilder(
+                            animation: _gradientController,
+                            builder: (context, child) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF143877).withOpacity(0.35), // Blue at top
+                                      Color(0xFF1A4A8F).withOpacity(0.45), // Lighter blue in middle
+                                      Color(0xFF143877).withOpacity(0.35), // Blue
+                                      Color(0xFF143877).withOpacity(0.2), // Fading out
+                                      Color(0xFF143877).withOpacity(0.1), // More faded
+                                      Colors.transparent, // Completely transparent at bottom
+                                    ],
+                                    stops: [0.0, 0.3, 0.6, 0.8, 0.9, 1.0],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFF143877).withOpacity(0.4), // Blue at top
+                                  Color(0xFF143877).withOpacity(0.3), // Fading
+                                  Color(0xFF143877).withOpacity(0.2), // More faded
+                                  Color(0xFF143877).withOpacity(0.1), // Very faded
+                                  Colors.transparent, // Completely transparent at bottom
+                                ],
+                                stops: [0.0, 0.4, 0.7, 0.9, 1.0],
+                              ),
+                            ),
+                          ),
+                    ),
+                    
+                    // NEW: Additional spinning northern lights overlay for entire section
+                    Positioned.fill(
+                      child: _animationsInitialized 
+                        ? AnimatedBuilder(
+                            animation: _gradientController,
+                            builder: (context, child) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF143877).withOpacity(0.15), // Darker end
+                                      Color(0xFF1A4A8F).withOpacity(0.25), // Lighter center
+                                      Color(0xFF1A4A8F).withOpacity(0.35), // Lighter center
+                                      Color(0xFF1A4A8F).withOpacity(0.25), // Lighter center
+                                      Color(0xFF143877).withOpacity(0.15), // Darker end
+                                    ],
+                                    stops: [0.05, 0.15,0.5,0.85, 0.95],
+                                    transform: GradientRotation(
+                                      _gradientController.value * 2 * 3.14159, // Full rotation
                                     ),
                                   ),
                                 ),
-                          ),
-                          
-                          // Content on top of the northern lights
-                          isMobile || isTablet
+                              );
+                            },
+                          )
+                        : Container(), // Empty container when not initialized
+                    ),
+                    
+                    // Content on top of the northern lights
+                    Column(
+                      children: [
+                        Expanded(
+                          child: isMobile || isTablet
                               ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
                               : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
-                        ],
-                      ),
-                    ),
-                    
-                    // Divider line
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 40),
-                      height: 1,
-                      color: Colors.white.withOpacity(0.3),
-                    ),
-                    
-                    // Copyright text
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                      child: Text(
-                        '© 2024 RGP IT Solutions. All rights reserved.',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
+                        
+                        // Divider line
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 60), // Increased padding on sides
+                          height: 2, // Increased thickness from 1 to 2px
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        
+                        // Copyright text
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Open GitHub profile in new tab
+                              // Note: In web, this would need to be implemented with url_launcher
+                            },
+                            child: Text(
+                              '© 2025 father_hardstone on GitHub. All rights reserved.',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.7),
+                                fontSize: 16, // Increased font size from 14 to 16
+                                fontWeight: FontWeight.bold, // Changed from w400 to bold
+                                decoration: TextDecoration.underline, // Add underline to indicate it's clickable
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

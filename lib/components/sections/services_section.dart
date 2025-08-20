@@ -232,11 +232,14 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
                                               begin: Alignment.centerLeft,
                                               end: Alignment.centerRight,
                                               colors: [
-                                                Color(0xFF143877).withOpacity(0.15), // Subtle blue
-                                                Color(0xFF1A4A8F).withOpacity(0.25), // Medium blue
-                                                Color(0xFF143877).withOpacity(0.15), // Subtle blue
+                                                Color(0xFF143877).withOpacity(0.11), // Subtle blue
+                                                Color(0xFF143877).withOpacity(0.17), // Subtle blue
+                                                Color(0xFF1A4A8F).withOpacity(0.18), // Medium blue
+                                                Color(0xFF1A4A8F).withOpacity(0.18), // Medium blue 
+                                                Color(0xFF143877).withOpacity(0.17), // Subtle blue
+                                                Color(0xFF143877).withOpacity(0.11), // Subtle blue   
                                               ],
-                                              stops: [0.2, 0.5, 0.8],
+                                              stops: [0.1,0.2, 0.4, 0.6, 0.8, 0.9],
                                               transform: GradientRotation(
                                                 _gradientController.value * 2 * 3.14159, // Full rotation
                                               ),
