@@ -210,7 +210,7 @@ class _ServicesSectionState extends State<ServicesSection> with TickerProviderSt
                         height: sectionHeight,
                         decoration: const BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/wallpaperflare.com_wallpaper (1).jpg'),
+                            image: AssetImage('assets/wallpaperflare.com_wallpaper (1).webp'),
                             fit: BoxFit.cover,
                           ),
                         ),

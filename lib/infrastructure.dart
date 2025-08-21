@@ -75,7 +75,7 @@ class _infrastructureState extends State<infrastructure> {
             return Stack(children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/infrastructure_management/imbi1.jpg',
+                  'assets/infrastructure_management/imbi1.webp',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -178,7 +178,7 @@ class _infrastructureState extends State<infrastructure> {
             return Stack(children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/infrastructure_management/imbi2.jpg',
+                  'assets/infrastructure_management/imbi2.webp',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -276,7 +276,7 @@ class _infrastructureState extends State<infrastructure> {
                                 width: containerWidth,
                                 child: ClipRect(
                                   child: Image.asset(
-                                    'assets/infrastructure_management/imdp1.jpg',
+                                    'assets/infrastructure_management/imdp1.webp',
                                     fit: BoxFit
                                         .cover, // You can adjust the BoxFit property according to your needs
                                   ),
@@ -406,7 +406,7 @@ class _infrastructureState extends State<infrastructure> {
                                   width: containerWidth * 0.45,
                                   child: ClipRect(
                                     child: Image.asset(
-                                      'assets/infrastructure_management/imdp1.jpg',
+                                      'assets/infrastructure_management/imdp1.webp',
                                       fit: BoxFit
                                           .cover, // You can adjust the BoxFit property according to your needs
                                     ),

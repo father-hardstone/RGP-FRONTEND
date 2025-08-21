@@ -162,6 +162,9 @@ class _ContactFormSectionState extends State<ContactFormSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.6, // Ensure minimum height is 60% of screen height
+      ),
       padding: EdgeInsets.only(
         left: widget.isMobile ? 16.0 : 24.0,
         right: widget.isMobile ? 16.0 : 24.0,

@@ -17,6 +17,9 @@ class ContactTextSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 20.0 : 40.0), // More padding around content
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.4, // Ensure minimum height is 40% of screen height
+      ),
       child: Center( // Center the content
         child: ConstrainedBox( // Constrain content width
           constraints: BoxConstraints(
@@ -36,7 +39,7 @@ class ContactTextSection extends StatelessWidget {
                 ),
               ),
               
-                             const SizedBox(height: 48), // Double spacing between heading and subheading
+                             SizedBox(height: isMobile ? 24.0 : 48.0), // Responsive spacing between heading and subheading
               
               // Sub heading
               Text(
@@ -48,7 +51,7 @@ class ContactTextSection extends StatelessWidget {
                 ),
               ),
               
-                             const SizedBox(height: 80), // Double spacing between subheading and text
+              SizedBox(height: isMobile ? 40.0 : 80.0), // Responsive spacing between subheading and text
               
               // Description text
               Text(
@@ -60,7 +63,7 @@ class ContactTextSection extends StatelessWidget {
                 ),
               ),
               
-                             const SizedBox(height: 64), // Double spacing
+              SizedBox(height: isMobile ? 32.0 : 64.0), // Responsive spacing
               
               // Social media icons
               Row(

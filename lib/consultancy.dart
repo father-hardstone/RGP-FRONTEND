@@ -73,7 +73,7 @@ class _ConsultancyState extends State<consultancy> {
             return Stack(children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/consultancy/cbi1.jpg',
+                  'assets/consultancy/cbi1.webp',
                   fit: BoxFit.cover,
                 ),
               ),

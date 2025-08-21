@@ -28,8 +28,8 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
   double _currentScrollOffset = 0.0;
   static const double _maxScrollOffset = 500.0; // Max scroll distance for zoom effect
   static const double _minScale = 1.0; // Normal size when at top
-  static const double _maxScale = 1.15; // Max zoom when scrolled down
-  static const double _initialScale = 1.3; // Starting scale on page load
+  static const double _maxScale = 1.02; // Minimal zoom when scrolled down
+  static const double _initialScale = 1.0; // Start at normal size (no initial zoom)
   
   // Flag to track if animations are initialized
   bool _animationsInitialized = false;
@@ -70,14 +70,14 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
       curve: Curves.easeOutCubic,
     ));
     
-    // Create scroll zoom animation (background zoom based on scroll position)
-    _scrollZoomAnimation = Tween<double>(
-      begin: _minScale,
-      end: _maxScale,
-    ).animate(CurvedAnimation(
-      parent: _scrollZoomController,
-      curve: Curves.easeOutCubic,
-    ));
+         // Create scroll zoom animation (background zoom based on scroll position)
+     _scrollZoomAnimation = Tween<double>(
+       begin: 1.0, // Start at normal size (no zoom)
+       end: _maxScale,
+     ).animate(CurvedAnimation(
+       parent: _scrollZoomController,
+       curve: Curves.easeOutCubic,
+     ));
     
     // Start initial zoom animation
     _initialZoomController.forward();
@@ -139,20 +139,21 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
     return Scaffold(
       body: Stack(
         children: [
-          // Background image with combined zoom effects
+          // Background image - ensure full image is visible
           AnimatedBuilder(
             animation: Listenable.merge([_initialZoomAnimation, _scrollZoomAnimation]),
             builder: (context, child) {
-              // Combine both zoom effects: initial zoom + scroll zoom
-              final double combinedScale = _initialZoomAnimation.value + _scrollZoomAnimation.value;
+              // Combine both zoom effects: initial zoom * scroll zoom (multiplicative)
+              final double combinedScale = _initialZoomAnimation.value * _scrollZoomAnimation.value;
               
               return Transform.scale(
                 scale: combinedScale,
                 child: Image.asset(
-                  'assets/bti5.jpg',
-                  fit: BoxFit.cover,
+                  'assets/bti5.webp',
+                  fit: BoxFit.cover, // Back to cover for full screen coverage
                   width: double.infinity,
                   height: double.infinity,
+                  alignment: Alignment.center, // Center the image
                 ),
               );
             },
