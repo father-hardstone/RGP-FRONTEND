@@ -77,7 +77,7 @@ class _softwareState extends State<software> {
             return Stack(children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/software_solutions/ssbi1.webp',
+                  'assets/software_solutions/ssbi1.jpg',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -181,7 +181,7 @@ class _softwareState extends State<software> {
             return Stack(children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/software_solutions/ssbi2.webp',
+                  'assets/software_solutions/ssbi2.jpg',
                   fit: BoxFit.cover,
                 ),
               ),
