@@ -57,10 +57,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "build/web/**/*.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
