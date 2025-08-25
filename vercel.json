@@ -1,5 +1,5 @@
 {
-  "buildCommand": "flutter/bin/flutter build web --release --web-renderer canvaskit --dart-define=FLUTTER_WEB_USE_SKIA=true",
+  "buildCommand": "flutter/bin/flutter build web --release",
   "outputDirectory": "build/web",
   "rewrites": [
     {
@@ -23,44 +23,8 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
-    },
-    {
-      "source": "/canvaskit/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.js)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.wasm)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
-  ],
-  "functions": {
-    "build/web/**/*.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }

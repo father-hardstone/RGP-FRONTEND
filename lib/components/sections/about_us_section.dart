@@ -143,18 +143,18 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
   Widget _buildMobileLayout(double width, double height, double textSize, double headingSize) {
     return Column(
       children: [
-        // Text section with background (60% height)
+        // Text section with background
         Expanded(
-          flex: 6,
+          flex: 8,
           child: AboutUsTextSection(
             textSize: textSize,
             headingSize: headingSize,
             isMobile: true,
           ),
         ),
-        // Image section below text on mobile/tablet (40% height)
+        // Image section below text on mobile/tablet
         Expanded(
-          flex: 4,
+          flex: 2,
           child: ClipRect(
             child: AnimatedBuilder(
               animation: _imageZoomAnimation,
@@ -164,7 +164,7 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: const AssetImage('assets/aup1.webp'),
+                        image: const AssetImage('assets/aup1.jpg'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -202,7 +202,7 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: const AssetImage('assets/aup1.webp'),
+                        image: const AssetImage('assets/aup1.jpg'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -218,11 +218,11 @@ class _AboutUsSectionState extends State<AboutUsSection> with TickerProviderStat
 
   double _calculateSectionHeight(double width, double height, bool isMobile) {
     if (isMobile) {
-      return height * 1.1 + 200.0; // Add 200px for mobile/tablet
+      return height * 1.1;
     } else if (width < 1200) {
-      return height * 0.8 + 200.0; // Add 200px for small desktop
+      return height * 0.8;
     } else {
-      return height * 0.85; // No change for large desktop
+      return height * 0.85;
     }
   }
 
