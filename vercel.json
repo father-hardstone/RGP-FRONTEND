@@ -1,5 +1,6 @@
 {
-  "buildCommand": "flutter/bin/flutter build web --release",
+
+  "buildCommand": "flutter/bin/flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=true",
   "outputDirectory": "build/web",
   "rewrites": [
     {
@@ -19,6 +20,25 @@
     },
     {
       "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+
+    },
+    {
+      "source": "/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.wasm)",
       "headers": [
         {
           "key": "Cache-Control",
