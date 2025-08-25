@@ -139,91 +139,42 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                     ),
                     
                     // Content on top of the northern lights
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        // For very small screens, wrap in SingleChildScrollView to prevent overflow
-                        if (constraints.maxHeight < 600) {
-                          return SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: sectionHeight - 100, // Reserve space for footer
-                                  child: isMobile || isTablet
-                                      ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
-                                      : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
-                                ),
-                                
-                                // Divider line
-                                Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 60), // Increased padding on sides
-                                  height: 2, // Increased thickness from 1 to 2px
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
-                                
-                                // Copyright text
-                                Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Open GitHub profile in new tab
-                                      // Note: In web, this would need to be implemented with url_launcher
-                                    },
-                                    child: Text(
-                                      '© 2025 father_hardstone on GitHub. All rights reserved.',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.7),
-                                        fontSize: 16, // Increased font size from 14 to 16
-                                        fontWeight: FontWeight.bold, // Changed from w400 to bold
-                                        // decoration: TextDecoration.underline, // Removed underline
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                    Column(
+                      children: [
+                        Expanded(
+                          child: isMobile || isTablet
+                              ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
+                              : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
+                        ),
+                        
+                        // Divider line
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 60), // Increased padding on sides
+                          height: 2, // Increased thickness from 1 to 2px
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        
+                        // Copyright text
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Open GitHub profile in new tab
+                              // Note: In web, this would need to be implemented with url_launcher
+                            },
+                            child: Text(
+                              '© 2025 father_hardstone on GitHub. All rights reserved.',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.7),
+                                fontSize: 16, // Increased font size from 14 to 16
+                                fontWeight: FontWeight.bold, // Changed from w400 to bold
+                                decoration: TextDecoration.underline, // Add underline to indicate it's clickable
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          );
-                        } else {
-                          // Normal layout for larger screens
-                          return Column(
-                            children: [
-                              Expanded(
-                                child: isMobile || isTablet
-                                    ? _buildMobileLayout(width, sectionHeight, textSize, headingSize)
-                                    : _buildDesktopLayout(width, sectionHeight, textSize, headingSize),
-                              ),
-                              
-                              // Divider line
-                              Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 60), // Increased padding on sides
-                                height: 2, // Increased thickness from 1 to 2px
-                                color: Colors.white.withOpacity(0.3),
-                              ),
-                              
-                              // Copyright text
-                              Container(
-                                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // Open GitHub profile in new tab
-                                    // Note: In web, this would need to be implemented with url_launcher
-                                  },
-                                  child: Text(
-                                    '© 2025 father_hardstone on GitHub. All rights reserved.',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontSize: 16, // Increased font size from 14 to 16
-                                      fontWeight: FontWeight.bold, // Changed from w400 to bold
-                                                                              // decoration: TextDecoration.underline, // Removed underline
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -239,18 +190,18 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
   Widget _buildMobileLayout(double width, double height, double textSize, double headingSize) {
     return Column(
       children: [
-        // Text section - 30% height
+        // Text section - 40% height
         Expanded(
-          flex: 3,
+          flex: 2,
           child: ContactTextSection(
             textSize: textSize,
             headingSize: headingSize,
             isMobile: true,
           ),
         ),
-        // Form section - 70% height
+        // Form section - 60% height
         Expanded(
-          flex: 7, // 3:7 ratio gives 70% to form, 30% to text
+          flex: 3, // 3:2 ratio gives 60% to form, 40% to text
           child: ContactFormSection(
             textSize: textSize,
             isMobile: true,
@@ -285,26 +236,15 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
   }
 
   double _calculateSectionHeight(double width, double height, bool isMobile) {
-    // Ensure minimum height is at least full screen height to prevent overflow
-    // Use more conservative multipliers to avoid excessive height
     if (width < 600) {
-      // Small mobile: ensure at least full height, but not too much more
-      return height * 1.2 + 400.0; // Add 350px for mobile
+      return height * 1.85; // Small mobile: adjusted height to prevent overflow
     } else if (width < 800) {
-      // Tablet: ensure at least full height
-      return height * 1.1 + 500.0; // Add 350px for tablet
+      return height * 1.8; // Tablet: increased height for better proportions
     } else if (width < 1200) {
-      // Small desktop: ensure at least full height
-      return height * 1.0 ; // No extra height for desktop
+      return height * 0.85; // Small desktop: slight height increase
     } else {
-      // Large desktop: ensure at least full height
-      return height * 1.0 ; // No extra height for desktop
+      return height * 0.9; // Large desktop: moderate height
     }
-    // if (height < 800) {
-    //   return height * 1.0 + 300.0; // No extra height for desktop
-    // } else {
-    //   return height * 1.0 ; // No extra height for desktop
-    // }
   }
 
   double _calculateTextSize(double width, bool isMobile) {
