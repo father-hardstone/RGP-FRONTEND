@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:rgp_landing_take_3/constants/typography.dart';
 import 'package:rgp_landing_take_3/services/contact_service.dart';
-
+import 'package:visibility_detector/visibility_detector.dart'; // add this
 class ContactFormSection extends StatefulWidget {
   final double textSize;
   final bool isMobile;
 
-  const ContactFormSection({
-    super.key,
-    required this.textSize,
-    required this.isMobile,
-  });
+  const ContactFormSection({super.key, required this.textSize, required this.isMobile});
 
   @override
   State<ContactFormSection> createState() => _ContactFormSectionState();
@@ -22,34 +18,18 @@ class _ContactFormSectionState extends State<ContactFormSection> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final _phoneController = TextEditingController(text: '+92');
   final _companyController = TextEditingController();
-  String _queryType = 'General Inquiry';
   final _queryController = TextEditingController();
-  
+
+  String _queryType = 'General Inquiry';
   bool _isSubmitting = false;
+
   static const int _maxQueryLength = 300;
-  
-  // Phone number formatting
-  static const String _defaultCountryCode = '+92';
-  static const int _maxPhoneLength = 16; // +92 331 4554 742 = 16 characters
-
+  static const int _maxPhoneLength = 16;
   final List<String> _queryTypes = [
-    'General Inquiry',
-    'IT Solutions',
-    'Consulting',
-    'Infrastructure',
-    'Software Development',
-    'Support',
+    'General Inquiry', 'IT Solutions', 'Consulting', 'Infrastructure', 'Software Development', 'Support'
   ];
-  
-  @override
-  void initState() {
-    super.initState();
-    // Initialize phone number with +92 prefix
-    _phoneController.text = _defaultCountryCode;
-  }
-
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -60,36 +40,17 @@ class _ContactFormSectionState extends State<ContactFormSection> {
     _queryController.dispose();
     super.dispose();
   }
-  
-  /// Format phone number according to Pakistani format: +92 331 4554 742
+
   String _formatPhoneNumber(String text) {
-    // Remove all non-digit characters except +
     String digits = text.replaceAll(RegExp(r'[^\d+]'), '');
-    
-    // Ensure it starts with +92
-    if (!digits.startsWith('+92')) {
-      digits = '+92' + digits.replaceAll('+', '');
-    }
-    
-    // Remove the +92 prefix for formatting
+    if (!digits.startsWith('+92')) digits = '+92' + digits.replaceAll('+', '');
     String numberPart = digits.substring(3);
-    
-    // Format the number part with spaces
-    String formatted = '';
-    if (numberPart.length > 0) {
-      formatted = numberPart.substring(0, min(3, numberPart.length));
-    }
-    if (numberPart.length > 3) {
-      formatted += ' ' + numberPart.substring(3, min(7, numberPart.length));
-    }
-    if (numberPart.length > 7) {
-      formatted += ' ' + numberPart.substring(7, min(11, numberPart.length));
-    }
-    
+    String formatted = numberPart.length > 0 ? numberPart.substring(0, min(3, numberPart.length)) : '';
+    if (numberPart.length > 3) formatted += ' ' + numberPart.substring(3, min(7, numberPart.length));
+    if (numberPart.length > 7) formatted += ' ' + numberPart.substring(7, min(11, numberPart.length));
     return '+92 ' + formatted;
   }
-  
-  /// Handle phone number input changes
+
   void _onPhoneChanged(String value) {
     final formatted = _formatPhoneNumber(value);
     if (formatted != value) {
@@ -100,14 +61,10 @@ class _ContactFormSectionState extends State<ContactFormSection> {
     }
   }
 
-  void _submitForm() async {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isSubmitting = true;
-      });
-
+      setState(() => _isSubmitting = true);
       try {
-        // Call the contact service
         final result = await ContactService.submitForm(
           firstName: _firstNameController.text.trim(),
           lastName: _lastNameController.text.trim(),
@@ -118,294 +75,66 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           query: _queryController.text.trim(),
         );
 
-        // Show result message
-        if (mounted) {
-          if (result['success'] == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(result['message'] ?? 'Thank you! Your message has been sent successfully.'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            
-            // Clear form
-            _formKey.currentState!.reset();
-            _queryType = 'General Inquiry';
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(result['message'] ?? 'Failed to send message. Please try again.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(result['message'] ?? (result['success'] == true ? 'Message sent!' : 'Failed to send message')),
+          backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+        ));
+
+        if (result['success'] == true) {
+          _formKey.currentState!.reset();
+          _queryType = 'General Inquiry';
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error sending message: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Error sending message: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ));
         }
       } finally {
-        if (mounted) {
-          setState(() {
-            _isSubmitting = false;
-          });
-        }
+        if (mounted) setState(() => _isSubmitting = false);
       }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height * 0.6, // Ensure minimum height is 60% of screen height
-      ),
-      padding: EdgeInsets.only(
-        left: widget.isMobile ? 16.0 : 24.0,
-        right: widget.isMobile ? 16.0 : 24.0,
-        top: widget.isMobile ? 32.0 : 48.0, // Extra padding above form
-        bottom: widget.isMobile ? 16.0 : 24.0,
-      ),
-      child: Center( // Center the form
-        child: ConstrainedBox( // Constrain form width
-          constraints: BoxConstraints(
-            maxWidth: widget.isMobile ? double.infinity : 600, // Expanded width on desktop
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 1),
-              borderRadius: BorderRadius.circular(10),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white.withOpacity(0.08), // More transparent at top
-                  Colors.white.withOpacity(0.12), // Medium opacity in middle
-                  Colors.white.withOpacity(0.18), // Denser at bottom
-                ],
-                stops: [0.0, 0.5, 1.0],
-              ),
-            ),
-            padding: EdgeInsets.only(
-              left: widget.isMobile ? 16.0 : 24.0,
-              right: widget.isMobile ? 24.0 : 32.0,
-              top: widget.isMobile ? 16.0 : 24.0,
-              bottom: widget.isMobile ? 8.0 : 12.0, // Reduced bottom padding
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Form fields in two columns for larger screens
-                  if (!widget.isMobile) ...[
-                    // First row: First Name and Last Name
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _firstNameController,
-                            label: 'First Name',
-                            maxLength: 50,
-                            validator: null, // Can be empty
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _lastNameController,
-                            label: 'Last Name',
-                            maxLength: 50,
-                            validator: null, // Can be empty
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Second row: Email and Phone
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _emailController,
-                            label: 'Email Address *',
-                            keyboardType: TextInputType.emailAddress,
-                            maxLength: 100,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _phoneController,
-                            label: 'Phone Number *',
-                            keyboardType: TextInputType.number,
-                            maxLength: _maxPhoneLength,
-                            onChanged: _onPhoneChanged,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your phone number';
-                              }
-                              // Validate Pakistani phone format: +92 331 4554 742
-                              if (!RegExp(r'^\+92 \d{3} \d{4} \d{3}$').hasMatch(value)) {
-                                return 'Please enter a valid phone number (e.g., +92 331 4554 742)';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ] else ...[
-                    // Mobile layout: Single column
-                    _buildTextField(
-                      controller: _firstNameController,
-                      label: 'First Name',
-                      maxLength: 50,
-                      validator: null, // Can be empty
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    _buildTextField(
-                      controller: _lastNameController,
-                      label: 'Last Name',
-                      maxLength: 50,
-                      validator: null, // Can be empty
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    _buildTextField(
-                      controller: _emailController,
-                      label: 'Email Address *',
-                      keyboardType: TextInputType.emailAddress,
-                      maxLength: 100,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    _buildTextField(
-                      controller: _phoneController,
-                      label: 'Phone Number *',
-                      keyboardType: TextInputType.number,
-                      maxLength: _maxPhoneLength,
-                      onChanged: _onPhoneChanged,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your phone number';
-                        }
-                        // Validate Pakistani phone format: +92 331 4554 742
-                        if (!RegExp(r'^\+92 \d{3} \d{4} \d{3}$').hasMatch(value)) {
-                          return 'Please enter a valid phone number (e.g., +92 331 4554 742)';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                   
-                  const SizedBox(height: 16),
-                   
-                  // Company Name
-                  _buildTextField(
-                    controller: _companyController,
-                    label: 'Company Name',
-                    maxLength: 100,
-                    validator: null, // Can be empty
-                  ),
-                   
-                  const SizedBox(height: 16),
-                   
-                  // Query Type Dropdown
-                  _buildDropdownField(),
-                   
-                  const SizedBox(height: 16),
-                   
-                  // Query Text Area with character counter
-                  _buildTextAreaField(),
-                   
-                  const SizedBox(height: 16),
-                   
-                  // Submit Button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _isSubmitting ? null : _submitForm,
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: widget.isMobile ? 32 : widget.textSize * 1.8,
-                          vertical: widget.isMobile ? 16 : widget.textSize * 0.6, // Bigger for mobile
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: const BorderSide(color: Colors.white, width: 0.5),
-                        ),
-                        backgroundColor: Colors.white.withOpacity(0.1), // Blurred background
-                      ),
-                      child: _isSubmitting
-                          ? Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Sending...',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: widget.isMobile ? 16 : widget.textSize * 0.6,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Text(
-                              'Submit',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: widget.isMobile ? 16 : widget.textSize * 0.6, // Bigger font for mobile
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+  InputDecoration _fieldDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.8),
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: widget.isMobile ? 16 : widget.textSize * 0.8),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: widget.isMobile ? 12 : 16),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.1),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white, width: 0.5)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white, width: 0.5)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.blue, width: 0.5)),
+      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.red, width: 0.5)),
+      focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.red, width: 0.5)),
+      counterStyle: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: widget.isMobile ? 14 : 12),
     );
+  }
+
+  Widget _responsiveRow(List<Widget> children) {
+    if (widget.isMobile) {
+      return Column(
+        children: children.map((child) => Padding(padding: const EdgeInsets.only(bottom: 16), child: child)).toList(),
+      );
+    } else {
+      return Row(
+        children: children.asMap().entries.map((entry) {
+          final int index = entry.key;
+          final Widget child = entry.value;
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: index < children.length - 1 ? 16 : 0),
+              child: child,
+            ),
+          );
+        }).toList(),
+      );
+    }
   }
 
   Widget _buildTextField({
@@ -416,203 +145,192 @@ class _ContactFormSectionState extends State<ContactFormSection> {
     String? Function(String?)? validator,
     Function(String)? onChanged,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: widget.isMobile ? 14 : widget.textSize * 0.6, // Fixed size for mobile
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 4), // Minimal spacing
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLength: maxLength,
-          validator: validator,
-          onChanged: onChanged,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: widget.textSize * 0.7, // Smaller input text
-          ),
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16, 
-              vertical: widget.isMobile ? 6 : 8, // Smaller height for mobile/tablet
-            ),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8), // Standard button border radius
-              borderSide: const BorderSide(color: Colors.white, width: 0.5), // Reduced border width
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.white, width: 0.5),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.blue, width: 0.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 0.5),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 0.5),
-            ),
-            counterStyle: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 12,
-            ),
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLength: maxLength,
+      validator: validator,
+      onChanged: onChanged,
+      style: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.8),
+      decoration: _fieldDecoration(label),
     );
   }
 
   Widget _buildDropdownField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Query Type',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: widget.isMobile ? 14 : widget.textSize * 0.6, // Fixed size for mobile
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 4), // Minimal spacing
-        DropdownButtonFormField<String>(
-          value: _queryType,
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16, 
-              vertical: widget.isMobile ? 6 : 8, // Smaller height for mobile/tablet
-            ),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8), // Standard button border radius
-              borderSide: const BorderSide(color: Colors.white, width: 0.5), // Reduced border width
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.white, width: 0.5),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.blue, width: 0.5),
-            ),
-          ),
-          dropdownColor: const Color(0xFF143877),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: widget.textSize * 0.7, // Smaller text
-          ),
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18), // Smaller icon
-          items: _queryTypes.map((String type) {
-            return DropdownMenuItem<String>(
-              value: type,
-              child: Text(type),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              _queryType = newValue!;
-            });
-          },
-        ),
-      ],
+    return DropdownButtonFormField<String>(
+      value: _queryType,
+      decoration: _fieldDecoration('Query Type'),
+      dropdownColor: const Color(0xFF143877),
+      style: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.8),
+      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18),
+      items: _queryTypes.map((type) => DropdownMenuItem(
+        value: type, 
+        child: Text(type, style: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.8))
+      )).toList(),
+      onChanged: (value) => setState(() => _queryType = value!),
     );
   }
 
   Widget _buildTextAreaField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Query',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: widget.isMobile ? 14 : widget.textSize * 0.6, // Fixed size for mobile
-                fontWeight: FontWeight.w500,
+    return TextFormField(
+      controller: _queryController,
+      maxLines: 4,
+      maxLength: _maxQueryLength,
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Please enter your query';
+        if (value.length > _maxQueryLength) return 'Query cannot exceed $_maxQueryLength characters';
+        return null;
+      },
+      onChanged: (value) => setState(() {}),
+      style: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.8),
+      decoration: _fieldDecoration('Query'),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return TextButton(
+      onPressed: _isSubmitting ? null : _submitForm,
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 32 : widget.textSize * 1.8, vertical: widget.isMobile ? 16 : widget.textSize * 0.6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: Colors.white, width: 0.5)),
+        backgroundColor: Colors.white.withOpacity(0.1),
+      ),
+      child: _isSubmitting
+          ? Row(mainAxisSize: MainAxisSize.min, children: [
+              SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white))),
+              const SizedBox(width: 8),
+              Text('Sending...', style: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.6, fontWeight: FontWeight.bold)),
+            ])
+          : Text('Submit', style: TextStyle(color: Colors.white, fontSize: widget.isMobile ? 16 : widget.textSize * 0.6, fontWeight: FontWeight.bold)),
+    );
+  }
+
+    bool _formVisible = false;
+  List<bool> _fieldVisible = List.filled(6, false); // 7 fields to animate individually
+
+  void _animateFields() {
+    for (int i = 0; i < _fieldVisible.length; i++) {
+      Future.delayed(Duration(milliseconds: i * 100), () {
+        if (mounted) setState(() => _fieldVisible[i] = true);
+      });
+    }
+  }
+
+  void _hideFields() {
+    for (int i = 0; i < _fieldVisible.length; i++) {
+      if (mounted) setState(() => _fieldVisible[i] = false);
+    }
+  }
+
+  Widget _animatedField({required Widget child, required int index}) {
+    return AnimatedSlide(
+      offset: _fieldVisible[index] ? Offset(0,0) : Offset(0,0.2),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
+      child: AnimatedOpacity(
+        opacity: _fieldVisible[index] ? 1 : 0,
+        duration: const Duration(milliseconds: 400),
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double minHeight = widget.isMobile ? MediaQuery.of(context).size.height * 0.6 
+      : max(700, MediaQuery.of(context).size.height * 0.6);
+
+    return VisibilityDetector(
+      key: Key('contact_form_section'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.5 && !_formVisible) {
+          setState(() => _formVisible = true);
+          _animateFields();
+        } else if (info.visibleFraction < 0.1 && _formVisible) {
+          setState(() => _formVisible = false);
+          _hideFields();
+        }
+      },
+      child: Container(
+        constraints: BoxConstraints(minHeight: minHeight),
+        padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 16 : 24, vertical: widget.isMobile ? 32 : 48),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: widget.isMobile ? double.infinity : 600),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 1),
+                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withOpacity(0.08),
+                    Colors.white.withOpacity(0.12),
+                    Colors.white.withOpacity(0.18)
+                  ],
+                  stops: [0.0, 0.5, 1.0],
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 20 : 32, vertical: widget.isMobile ? 24 : 32),
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _animatedField(
+                        index: 0,
+                        child: _responsiveRow([
+                          _buildTextField(controller: _firstNameController, label: 'First Name', maxLength: 50),
+                          _buildTextField(controller: _lastNameController, label: 'Last Name', maxLength: 50),
+                        ]),
+                      ),
+                      const SizedBox(height: 20),
+                      _animatedField(
+                        index: 1,
+                        child: _responsiveRow([
+                          _buildTextField(
+                            controller: _emailController,
+                            label: 'Email Address *',
+                            keyboardType: TextInputType.emailAddress,
+                            maxLength: 100,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) return 'Please enter your email';
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) return 'Please enter a valid email';
+                              return null;
+                            },
+                          ),
+                          _buildTextField(
+                            controller: _phoneController,
+                            label: 'Phone Number *',
+                            keyboardType: TextInputType.number,
+                            maxLength: _maxPhoneLength,
+                            onChanged: _onPhoneChanged,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) return 'Please enter your phone number';
+                              if (!RegExp(r'^\+92 \d{3} \d{4} \d{3}$').hasMatch(value)) return 'Please enter a valid phone number (e.g., +92 331 4554 742)';
+                              return null;
+                            },
+                          ),
+                        ]),
+                      ),
+                      const SizedBox(height: 20),
+                      _animatedField(index: 2, child: _buildTextField(controller: _companyController, label: 'Company Name', maxLength: 100)),
+                      const SizedBox(height: 20),
+                      _animatedField(index: 3, child: _buildDropdownField()),
+                      const SizedBox(height: 20),
+                      _animatedField(index: 4, child: _buildTextAreaField()),
+                      const SizedBox(height: 20),
+                      _animatedField(index: 5, child: Align(alignment: Alignment.centerRight, child: _buildSubmitButton())),
+                    ],
+                  ),
+                ),
               ),
             ),
-            Text(
-              '${_queryController.text.length}/$_maxQueryLength',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4), // Minimal spacing
-        TextFormField(
-          controller: _queryController,
-          maxLines: 4,
-          maxLength: _maxQueryLength,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: widget.textSize * 0.7, // Smaller text
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your query';
-            }
-            if (value.length > _maxQueryLength) {
-              return 'Query cannot exceed $_maxQueryLength characters';
-            }
-            return null;
-          },
-          onChanged: (value) {
-            setState(() {
-              // Trigger rebuild to update character counter
-            });
-          },
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16, 
-              vertical: widget.isMobile ? 6 : 8, // Smaller height for mobile/tablet
-            ),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8), // Standard button border radius
-              borderSide: const BorderSide(color: Colors.white, width: 0.5), // Reduced border width
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.white, width: 0.5),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.blue, width: 0.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 0.5),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 0.5),
-            ),
-            counterStyle: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 12,
-            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
