@@ -1,5 +1,5 @@
 {
-  "buildCommand": "flutter/bin/flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=true",
+  "buildCommand": "flutter/bin/flutter build web --release --dart-define=BACKEND_API_URL=${BACKEND_API_URL} --dart-define=ENQUIRY_ENDPOINT=${ENQUIRY_ENDPOINT} --dart-define=FLUTTER_WEB_USE_SKIA=true",
   "outputDirectory": "build/web",
   "rewrites": [
     {
