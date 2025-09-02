@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:rgp_landing_take_3/components/sections/contact_text_section.dart';
 import 'package:rgp_landing_take_3/components/sections/contact_form_section.dart';
 import 'package:rgp_landing_take_3/constants/typography.dart';
@@ -164,19 +165,45 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                                 Container(
                                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
                                   child: GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
                                       // Open GitHub profile in new tab
-                                      // Note: In web, this would need to be implemented with url_launcher
+                                      final Uri url = Uri.parse('https://github.com/father-hardstone');
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                                      }
                                     },
-                                    child: Text(
-                                      '© 2025 father_hardstone on GitHub. All rights reserved.',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.7),
-                                        fontSize: 16, // Increased font size from 14 to 16
-                                        fontWeight: FontWeight.bold, // Changed from w400 to bold
-                                        // decoration: TextDecoration.underline, // Removed underline
-                                      ),
+                                    child: RichText(
                                       textAlign: TextAlign.center,
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '© 2025 ',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.7),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: 'father-hardstone',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.9),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: Colors.white.withOpacity(0.7),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: ' on GitHub. All rights reserved.',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.7),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -204,19 +231,45 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                               Container(
                                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
                                 child: GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
                                     // Open GitHub profile in new tab
-                                    // Note: In web, this would need to be implemented with url_launcher
+                                    final Uri url = Uri.parse('https://github.com/father-hardstone');
+                                    if (await canLaunchUrl(url)) {
+                                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                                    }
                                   },
-                                  child: Text(
-                                    '© 2025 father_hardstone on GitHub. All rights reserved.',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontSize: 16, // Increased font size from 14 to 16
-                                      fontWeight: FontWeight.bold, // Changed from w400 to bold
-                                                                              // decoration: TextDecoration.underline, // Removed underline
-                                    ),
+                                  child: RichText(
                                     textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '© 2025 ',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.7),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'father-hardstone',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                            decorationColor: Colors.white.withOpacity(0.7),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: ' on GitHub. All rights reserved.',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.7),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

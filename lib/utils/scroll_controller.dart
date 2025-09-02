@@ -29,52 +29,35 @@ class ScrollControllerHelper {
     final height = size.height;
 
     // Responsive breakpoints
-    const threshold1 = 800.0;
-    const threshold2 = 850.0;
-    const threshold3 = 1400.0;
+    const mobileThreshold = 600.0;
+    const tabletThreshold = 1024.0;
+    const desktopThreshold = 1400.0;
 
-    // Hero section
-    if (width < threshold1) {
-      pl1 = 600;
-    } else if (width < threshold3 && height < threshold2) {
-      pl1 = 950;
-    } else if (width >= threshold3 && height < threshold2) {
-      pl1 = 920;
-    } else {
-      pl1 = 0.92 * height;
+    // Mobile screens (width < 600)
+    if (width < mobileThreshold) {
+      pl1 = height * 0.9; // Hero section - full screen
+      pl2 = height * 1.2; // Services section - slightly taller
+      pl3 = height * 0.8; // Why choose us section
+      pl4 = height * 1.1; // About us section
+      pl5 = height * 0.9; // Contact section
+    }
+    // Tablet screens (600 <= width < 1024)
+    else if (width < tabletThreshold) {
+      pl1 = height * 0.9; // Hero section
+      pl2 = height * 1.0; // Services section
+      pl3 = height * 0.7; // Why choose us section
+      pl4 = height * 1.0; // About us section
+      pl5 = height * 0.9; // Contact section
+    }
+    // Desktop screens (width >= 1024)
+    else {
+      pl1 = height * 0.9; // Hero section
+      pl2 = height * 1.0; // Services section
+      pl3 = height * 0.7; // Why choose us section
+      pl4 = height * 0.9; // About us section
+      pl5 = height * 0.8; // Contact section
     }
 
-    // Services section
-    if (width < threshold1) {
-      pl2 = 1430;
-    } else if (width < threshold3 && height < threshold2) {
-      pl2 = 1210;
-    } else if (width >= threshold3 && height < threshold2) {
-      pl2 = 920;
-    } else {
-      pl2 = height;
-    }
-
-    // Why choose us section
-    if (width < threshold3 && height < threshold2) {
-      pl3 = 600;
-    } else if (width >= threshold3 && height < threshold2) {
-      pl3 = 650;
-    } else {
-      pl3 = 0.7 * height;
-    }
-
-    // About us section
-    if (width < threshold3 && height < threshold2) {
-      pl4 = 1000;
-    } else if (width >= threshold3 && height < threshold2) {
-      pl4 = 950;
-    } else {
-      pl4 = 0.92 * height;
-    }
-
-    // Contact section
-    pl5 = 0.8 * height;
     pl6 = height;
 
     // Debug output
@@ -89,26 +72,49 @@ class ScrollControllerHelper {
 
   // Scroll to specific section
   void scrollToSection(ScrollController controller, int sectionIndex) {
-    // Use dynamic positioning for better accuracy across different screen sizes
-    scrollToSectionDynamic(controller, sectionIndex);
+    // Ensure page lengths are calculated
+    if (pl1 == 0 && _landingPage?.context != null) {
+      calculatePageLengths(_landingPage.context);
+    }
     
-    // Get the calculated offset from the dynamic method
+    // Get the calculated offset
     double offset = 0;
     final context = _landingPage?.context;
     if (context != null) {
       final size = MediaQuery.of(context).size;
       final screenHeight = size.height;
-      final double responsiveOffset = screenHeight * 0.1;
+      final screenWidth = size.width;
+      
+      // Calculate responsive offset based on screen size
+      double responsiveOffset;
+      if (screenWidth < 600) {
+        // Mobile - smaller offset
+        responsiveOffset = screenHeight * 0.05;
+      } else if (screenWidth < 1024) {
+        // Tablet - medium offset
+        responsiveOffset = screenHeight * 0.08;
+      } else {
+        // Desktop - larger offset
+        responsiveOffset = screenHeight * 0.1;
+      }
       
       switch (sectionIndex) {
         case 1: // About Us
           offset = pl1 + pl2 + pl3 - responsiveOffset;
           break;
         case 2: // Contact Us
-          offset = pl1 + pl2 + pl3 + pl4 - responsiveOffset;
+          // Hardcoded positions for mobile and tablet screens
+          if (screenWidth < 600) {
+            offset = 4580.485; // Exact position for mobile Contact section
+          } else if (screenWidth < 1024) {
+            offset = 3542.48; // Exact position for tablet Contact section
+          } else {
+            // For Contact Us, we want to show the full contact section
+            offset = pl1 + pl2 + pl3 + pl4 - (responsiveOffset * 0.5);
+          }
           break;
         case 3: // Learn More (Our Services section)
-          offset = pl1 + (responsiveOffset * 0.5);
+          offset = pl1 + (responsiveOffset * 0.3);
           break;
       }
     } else {
@@ -118,7 +124,8 @@ class ScrollControllerHelper {
           offset = pl1 + pl2 + pl3 - 100;
           break;
         case 2: // Contact Us
-          offset = pl1 + pl2 + pl3 + pl4 - 100;
+          // Use hardcoded positions for mobile and tablet in fallback too
+          offset = 3542.48; // Default to tablet position in fallback
           break;
         case 3: // Learn More (Our Services section)
           offset = pl1 + 50;
@@ -126,12 +133,21 @@ class ScrollControllerHelper {
       }
     }
 
+    // Ensure offset is within bounds
+    final maxScrollExtent = controller.position.maxScrollExtent;
+    if (offset > maxScrollExtent) {
+      offset = maxScrollExtent;
+    }
+    if (offset < 0) {
+      offset = 0;
+    }
+
     // Debug output
     print('Scrolling to section $sectionIndex');
     print('Page lengths: pl1=$pl1, pl2=$pl2, pl3=$pl3, pl4=$pl4, pl5=$pl5');
     print('Calculated offset: $offset');
     print('Current scroll position: ${controller.offset}');
-    print('Max scroll extent: ${controller.position.maxScrollExtent}');
+    print('Max scroll extent: $maxScrollExtent');
 
     // Use safe scrolling if available, otherwise fall back to standard
     if (_landingPage != null && _landingPage.safeScrollTo != null) {

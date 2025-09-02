@@ -1,6 +1,6 @@
 class Config {
   // Backend configuration (can be updated later if needed)
-  static const String backendApiUrl = 'http://localhost:5000';
+  static const String backendApiUrl = 'http://localhost:8080';
   static const String enquiryEndpoint = '/enquiry';
   
   static String get fullEnquiryUrl {

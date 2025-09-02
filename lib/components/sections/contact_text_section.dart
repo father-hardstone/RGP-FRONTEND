@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class ContactTextSection extends StatefulWidget {
@@ -114,12 +115,41 @@ class _ContactTextSectionState extends State<ContactTextSection> {
                 // Description text
                 _animatedElement(
                   index: 4,
-                  child: Text(
-                    "Get in touch with us to discuss how we can help your business with our expert IT solutions. You can reach us at operations@rgp-it.com",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: widget.isMobile ? 16.0 : 18.0,
-                      height: 1.5,
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Get in touch with us to discuss how we can help your business with our expert IT solutions. You can reach us at ",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: widget.isMobile ? 16.0 : 18.0,
+                            height: 1.5,
+                          ),
+                        ),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () async {
+                              final Uri emailUri = Uri(
+                                scheme: 'mailto',
+                                path: 'syedibrahimshah067@gmail.com',
+                              );
+                              if (await canLaunchUrl(emailUri)) {
+                                await launchUrl(emailUri);
+                              }
+                            },
+                            child: Text(
+                              'syedibrahimshah067@gmail.com',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: widget.isMobile ? 16.0 : 18.0,
+                                height: 1.5,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.white.withOpacity(0.7),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -130,11 +160,26 @@ class _ContactTextSectionState extends State<ContactTextSection> {
                     padding: EdgeInsets.only(top: widget.isMobile ? 32.0 : 64.0),
                     child: Row(
                       children: [
-                        _buildSocialIcon(Icons.facebook, () {}),
+                        _buildSocialIcon(Icons.facebook, () async {
+                          final Uri url = Uri.parse('https://github.com/father-hardstone');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          }
+                        }),
                         const SizedBox(width: 16),
-                        _buildSocialIcon(Icons.business, () {}),
+                        _buildSocialIcon(Icons.business, () async {
+                          final Uri url = Uri.parse('https://github.com/father-hardstone');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          }
+                        }),
                         const SizedBox(width: 16),
-                        _buildSocialIcon(Icons.flutter_dash, () {}),
+                        _buildSocialIcon(Icons.flutter_dash, () async {
+                          final Uri url = Uri.parse('https://github.com/father-hardstone');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          }
+                        }),
                       ],
                     ),
                   ),

@@ -88,6 +88,12 @@ flutter:
   # Service page images (infrastructure)
   # - assets/infrastructure_management/imbi2.webp
   - assets/infrastructure_management/imdp1.jpg
+  
+  # Icons
+  - assets/icons/RGP GLOBAL-IT.png
+  - assets/icons/RGP GLOBAL-IT black.png
+  - assets/icons/RGP GLOBAL-IT- mobile.png
+  - assets/icons/RGP GLOBAL-IT- mobile-black.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
