@@ -67,8 +67,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-
-  
   # Background and main images
   - assets/bti5.webp
   - assets/bti7.jpg

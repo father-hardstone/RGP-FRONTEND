@@ -40,7 +40,6 @@ class ContactService {
     required String query,
   }) async {
     try {
-      // Create the request payload
       final payload = _createContactPayload(
         firstName: firstName,
         lastName: lastName,
@@ -51,13 +50,7 @@ class ContactService {
         query: query,
       );
       
-      // Make HTTP POST request to backend
       final jsonBody = jsonEncode(payload);
-      
-      // Debug: Print the request details
-      print('Sending POST request to: $_baseUrl$_enquiryEndpoint');
-      print('Headers: Content-Type: application/json');
-      print('Body: $jsonBody');
       
       final response = await http.post(
         Uri.parse('$_baseUrl$_enquiryEndpoint'),
@@ -65,29 +58,28 @@ class ContactService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'User-Agent': 'RGP-Landing-Form/1.0',
-          // Add any authentication headers if needed
-          // 'Authorization': 'Bearer $token',
         },
         body: jsonBody,
       ).timeout(
-        const Duration(seconds: 30), // 30 second timeout
+        const Duration(seconds: 30),
       );
       
-      // Check if request was successful
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        // Success response
-        final responseData = jsonDecode(response.body);
-        return {
-          'success': true,
-          'message': responseData['message'] ?? 'Message sent successfully!',
-          'data': responseData,
-        };
+        try {
+          final responseData = jsonDecode(response.body);
+          return {
+            'success': true,
+            'message': responseData['message'] ?? 'Message sent successfully!',
+            'data': responseData,
+          };
+        } catch (e) {
+          return {
+            'success': true,
+            'message': 'Message sent successfully!',
+            'data': response.body,
+          };
+        }
       } else {
-        // Error response from server
-        print('Error response: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        print('Response headers: ${response.headers}');
-        
         try {
           final errorData = jsonDecode(response.body);
           return {
@@ -106,7 +98,6 @@ class ContactService {
         }
       }
     } on http.ClientException catch (e) {
-      // Network/connection errors
       return {
         'success': false,
         'message': 'Network error: Unable to connect to server',
@@ -114,7 +105,6 @@ class ContactService {
         'details': e.toString(),
       };
     } on SocketException catch (e) {
-      // Socket/connection errors
       return {
         'success': false,
         'message': 'Connection error: Please check your internet connection',
@@ -122,7 +112,6 @@ class ContactService {
         'details': e.toString(),
       };
     } catch (e) {
-      // Any other unexpected errors
       return {
         'success': false,
         'message': 'An unexpected error occurred',
