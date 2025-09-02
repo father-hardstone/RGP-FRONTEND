@@ -7,28 +7,13 @@ import 'package:flutter/foundation.dart' show kReleaseMode;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('🔧 [DEBUG] Loading environment variables...');
-
   try {
     if (!kReleaseMode) {
-      // ✅ Load .env only for local development (debug/profile mode)
       await dotenv.load(fileName: ".env");
-      print('✅ [DEBUG] .env loaded successfully for local development');
-    } else {
-      // ✅ In release mode (e.g., Vercel), values will come from --dart-define
-      print('✅ [DEBUG] Skipping .env loading (production mode)');
     }
 
-    // Debug: Print values (will show dart-define or .env values)
-    print('🔍 [DEBUG] Config Values:');
-    print('  - Config.backendApiUrl: ${Config.backendApiUrl}');
-    print('  - Config.enquiryEndpoint: ${Config.enquiryEndpoint}');
-    print('  - Config.fullEnquiryUrl: ${Config.fullEnquiryUrl}');
-
-    // Start app
     runApp(const RgpApp());
   } catch (e) {
-    print('❌ [DEBUG] Failed to load environment variables: $e');
     runApp(MaterialApp(
       home: Scaffold(
         body: Center(
