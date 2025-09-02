@@ -132,7 +132,7 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                       ),
                     ),
                     
-                    // Northern Lights Breathing Effect - Layer 1
+                    // Northern Lights Breathing Effect - Layer 1 (TESTING - HIGH OPACITY)
                     Positioned.fill(
                       child: _animationsInitialized 
                         ? AnimatedBuilder(
@@ -144,8 +144,8 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      Color(0xFF1A4A8F).withOpacity(0.02 + (_breathingAnimation1.value * 0.03)),
-                                      Color(0xFF143877).withOpacity(0.01 + (_breathingAnimation1.value * 0.02)),
+                                      Color(0xFF1A4A8F).withOpacity(0.1 + (_breathingAnimation1.value * 0.2)),
+                                      Color(0xFF143877).withOpacity(0.05 + (_breathingAnimation1.value * 0.15)),
                                       Colors.transparent,
                                     ],
                                     stops: [0.0, 0.6, 1.0],
@@ -157,7 +157,7 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                         : Container(),
                     ),
                     
-                    // Northern Lights Breathing Effect - Layer 2
+                    // Northern Lights Breathing Effect - Layer 2 (TESTING - HIGH OPACITY)
                     Positioned.fill(
                       child: _animationsInitialized 
                         ? AnimatedBuilder(
@@ -170,8 +170,8 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                                     end: Alignment.bottomLeft,
                                     colors: [
                                       Colors.transparent,
-                                      Color(0xFF1A4A8F).withOpacity(0.01 + (_breathingAnimation2.value * 0.04)),
-                                      Color(0xFF143877).withOpacity(0.02 + (_breathingAnimation2.value * 0.03)),
+                                      Color(0xFF1A4A8F).withOpacity(0.05 + (_breathingAnimation2.value * 0.25)),
+                                      Color(0xFF143877).withOpacity(0.1 + (_breathingAnimation2.value * 0.2)),
                                     ],
                                     stops: [0.0, 0.4, 1.0],
                                   ),
@@ -182,7 +182,7 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                         : Container(),
                     ),
                     
-                    // Northern Lights Breathing Effect - Layer 3
+                    // Northern Lights Breathing Effect - Layer 3 (TESTING - HIGH OPACITY)
                     Positioned.fill(
                       child: _animationsInitialized 
                         ? AnimatedBuilder(
@@ -194,8 +194,8 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                                     center: Alignment.center,
                                     radius: 1.5,
                                     colors: [
-                                      Color(0xFF1A4A8F).withOpacity(0.01 + (_breathingAnimation3.value * 0.02)),
-                                      Color(0xFF143877).withOpacity(0.005 + (_breathingAnimation3.value * 0.015)),
+                                      Color(0xFF1A4A8F).withOpacity(0.05 + (_breathingAnimation3.value * 0.15)),
+                                      Color(0xFF143877).withOpacity(0.03 + (_breathingAnimation3.value * 0.12)),
                                       Colors.transparent,
                                     ],
                                     stops: [0.0, 0.7, 1.0],
