@@ -39,7 +39,14 @@ class ContactService {
     required String queryType,
     required String query,
   }) async {
+    print('🔧 [DEBUG] ContactService.submitForm called');
+    print('🔧 [DEBUG] Config values:');
+    print('  - _baseUrl: $_baseUrl');
+    print('  - _enquiryEndpoint: $_enquiryEndpoint');
+    print('  - Full URL: $_baseUrl$_enquiryEndpoint');
+    
     try {
+      // Create the request payload
       final payload = _createContactPayload(
         firstName: firstName,
         lastName: lastName,
@@ -50,29 +57,63 @@ class ContactService {
         query: query,
       );
       
+      print('📦 [DEBUG] Created payload:');
+      payload.forEach((key, value) {
+        print('  - $key: $value');
+      });
+      
+      // Make HTTP POST request to backend
       final jsonBody = jsonEncode(payload);
       
+      // Debug: Print the request details
+      print('🌐 [DEBUG] HTTP Request Details:');
+      print('  - URL: $_baseUrl$_enquiryEndpoint');
+      print('  - Method: POST');
+      print('  - Headers: Content-Type: application/json, Accept: application/json, User-Agent: RGP-Landing-Form/1.0');
+      print('  - Body: $jsonBody');
+      print('  - Timeout: 30 seconds');
+      
+      final uri = Uri.parse('$_baseUrl$_enquiryEndpoint');
+      print('🔗 [DEBUG] Parsed URI: $uri');
+      print('🔗 [DEBUG] URI scheme: ${uri.scheme}');
+      print('🔗 [DEBUG] URI host: ${uri.host}');
+      print('🔗 [DEBUG] URI port: ${uri.port}');
+      print('🔗 [DEBUG] URI path: ${uri.path}');
+      
       final response = await http.post(
-        Uri.parse('$_baseUrl$_enquiryEndpoint'),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'User-Agent': 'RGP-Landing-Form/1.0',
+          // Add any authentication headers if needed
+          // 'Authorization': 'Bearer $token',
         },
         body: jsonBody,
       ).timeout(
-        const Duration(seconds: 30),
+        const Duration(seconds: 30), // 30 second timeout
       );
       
+      print('📡 [DEBUG] HTTP Response received:');
+      print('  - Status Code: ${response.statusCode}');
+      print('  - Reason Phrase: ${response.reasonPhrase}');
+      print('  - Headers: ${response.headers}');
+      print('  - Body: ${response.body}');
+      
+      // Check if request was successful
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        print('✅ [DEBUG] HTTP request successful (${response.statusCode})');
+        // Success response
         try {
           final responseData = jsonDecode(response.body);
+          print('📄 [DEBUG] Parsed response data: $responseData');
           return {
             'success': true,
             'message': responseData['message'] ?? 'Message sent successfully!',
             'data': responseData,
           };
         } catch (e) {
+          print('⚠️ [DEBUG] Failed to parse success response JSON: $e');
           return {
             'success': true,
             'message': 'Message sent successfully!',
@@ -80,8 +121,13 @@ class ContactService {
           };
         }
       } else {
+        print('❌ [DEBUG] HTTP request failed with status: ${response.statusCode}');
+        print('❌ [DEBUG] Error response body: ${response.body}');
+        print('❌ [DEBUG] Error response headers: ${response.headers}');
+        
         try {
           final errorData = jsonDecode(response.body);
+          print('📄 [DEBUG] Parsed error data: $errorData');
           return {
             'success': false,
             'message': errorData['message'] ?? 'Failed to send message',
@@ -89,6 +135,7 @@ class ContactService {
             'details': errorData,
           };
         } catch (e) {
+          print('⚠️ [DEBUG] Failed to parse error response JSON: $e');
           return {
             'success': false,
             'message': 'Server error: ${response.statusCode}',
@@ -98,6 +145,12 @@ class ContactService {
         }
       }
     } on http.ClientException catch (e) {
+      print('🌐 [DEBUG] ClientException caught:');
+      print('  - Type: ${e.runtimeType}');
+      print('  - Message: ${e.message}');
+      print('  - Uri: ${e.uri}');
+      print('  - Stack trace: ${StackTrace.current}');
+      // Network/connection errors
       return {
         'success': false,
         'message': 'Network error: Unable to connect to server',
@@ -105,6 +158,12 @@ class ContactService {
         'details': e.toString(),
       };
     } on SocketException catch (e) {
+      print('🔌 [DEBUG] SocketException caught:');
+      print('  - Type: ${e.runtimeType}');
+      print('  - Message: ${e.message}');
+      print('  - OS Error: ${e.osError}');
+      print('  - Stack trace: ${StackTrace.current}');
+      // Socket/connection errors
       return {
         'success': false,
         'message': 'Connection error: Please check your internet connection',
@@ -112,6 +171,11 @@ class ContactService {
         'details': e.toString(),
       };
     } catch (e) {
+      print('💥 [DEBUG] Unexpected exception caught:');
+      print('  - Type: ${e.runtimeType}');
+      print('  - Message: ${e.toString()}');
+      print('  - Stack trace: ${StackTrace.current}');
+      // Any other unexpected errors
       return {
         'success': false,
         'message': 'An unexpected error occurred',
