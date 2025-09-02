@@ -67,8 +67,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-  # Environment configuration
-  - .env
+
   
   # Background and main images
   - assets/bti5.webp
