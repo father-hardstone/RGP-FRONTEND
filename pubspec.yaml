@@ -43,6 +43,7 @@ dependencies:
   http: ^1.1.0
   visibility_detector: ^0.4.0+2
   responsive_builder: ^0.7.1
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+  # Environment configuration
+  - .env
+  
   # Background and main images
   - assets/bti5.webp
   - assets/bti7.jpg
