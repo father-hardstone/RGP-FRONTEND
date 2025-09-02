@@ -7,13 +7,24 @@ import 'package:flutter/foundation.dart' show kReleaseMode;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  print('🔧 [DEBUG] Loading environment variables...');
+
   try {
     if (!kReleaseMode) {
       await dotenv.load(fileName: ".env");
+      print('✅ [DEBUG] .env loaded successfully for local development');
+    } else {
+      print('✅ [DEBUG] Skipping .env loading (production mode)');
     }
+
+    print('🔍 [DEBUG] Config Values:');
+    print('  - Config.backendApiUrl: ${Config.backendApiUrl}');
+    print('  - Config.enquiryEndpoint: ${Config.enquiryEndpoint}');
+    print('  - Config.fullEnquiryUrl: ${Config.fullEnquiryUrl}');
 
     runApp(const RgpApp());
   } catch (e) {
+    print('❌ [DEBUG] Failed to load environment variables: $e');
     runApp(MaterialApp(
       home: Scaffold(
         body: Center(
