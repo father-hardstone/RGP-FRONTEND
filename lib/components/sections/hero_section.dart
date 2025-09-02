@@ -349,8 +349,19 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
                               child: PrimaryButton(
                                 text: 'Learn More',
                                 onPressed: () {
-                                  // Use the scroll helper with safe scrolling
-                                  widget.scrollHelper.scrollToSection(widget.scrollController, 3);
+                                  // Ensure page lengths are calculated before scrolling
+                                  if (widget.scrollHelper.pl1 == 0) {
+                                    // Recalculate page lengths if not done
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      if (mounted) {
+                                        widget.scrollHelper.calculatePageLengths(context);
+                                        widget.scrollHelper.scrollToSection(widget.scrollController, 3);
+                                      }
+                                    });
+                                  } else {
+                                    // Use existing calculated lengths
+                                    widget.scrollHelper.scrollToSection(widget.scrollController, 3);
+                                  }
                                 },
                                 isMobile: false,
                               ),

@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:rgp_landing_take_3/config.dart';
 
 class ContactService {
-  // Base URL for your backend API
-  static const String _baseUrl = 'https://your-backend-api.com/api';
-  
-  // Endpoint for contact form submission
-  static const String _contactEndpoint = '/contact';
+  // Use config for API URL and endpoint
+  static String get _baseUrl => Config.backendApiUrl;
+  static String get _enquiryEndpoint => Config.enquiryEndpoint;
   
   /// Contact form data model
   static Map<String, dynamic> _createContactPayload({
@@ -20,15 +19,13 @@ class ContactService {
     required String query,
   }) {
     return {
-      'firstName': firstName.trim(),
-      'lastName': lastName.trim(),
+      'first_name': firstName.trim(),
+      'last_name': lastName.trim(),
       'email': email.trim(),
-      'phone': phone.trim(),
-      'company': company.trim(),
-      'queryType': queryType,
-      'query': query.trim(),
-      'timestamp': DateTime.now().toIso8601String(),
-      'source': 'rgp_landing_website',
+      'phone_number': phone.trim(),
+      'company_name': company.trim(),
+      'enquiry_type': queryType,
+      'message': query.trim(),
     };
   }
   
@@ -55,15 +52,23 @@ class ContactService {
       );
       
       // Make HTTP POST request to backend
+      final jsonBody = jsonEncode(payload);
+      
+      // Debug: Print the request details
+      print('Sending POST request to: $_baseUrl$_enquiryEndpoint');
+      print('Headers: Content-Type: application/json');
+      print('Body: $jsonBody');
+      
       final response = await http.post(
-        Uri.parse('$_baseUrl$_contactEndpoint'),
+        Uri.parse('$_baseUrl$_enquiryEndpoint'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'User-Agent': 'RGP-Landing-Form/1.0',
           // Add any authentication headers if needed
           // 'Authorization': 'Bearer $token',
         },
-        body: jsonEncode(payload),
+        body: jsonBody,
       ).timeout(
         const Duration(seconds: 30), // 30 second timeout
       );
@@ -79,13 +84,26 @@ class ContactService {
         };
       } else {
         // Error response from server
-        final errorData = jsonDecode(response.body);
-        return {
-          'success': false,
-          'message': errorData['message'] ?? 'Failed to send message',
-          'error': 'HTTP ${response.statusCode}',
-          'details': errorData,
-        };
+        print('Error response: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        print('Response headers: ${response.headers}');
+        
+        try {
+          final errorData = jsonDecode(response.body);
+          return {
+            'success': false,
+            'message': errorData['message'] ?? 'Failed to send message',
+            'error': 'HTTP ${response.statusCode}',
+            'details': errorData,
+          };
+        } catch (e) {
+          return {
+            'success': false,
+            'message': 'Server error: ${response.statusCode}',
+            'error': 'HTTP ${response.statusCode}',
+            'details': response.body,
+          };
+        }
       }
     } on http.ClientException catch (e) {
       // Network/connection errors
@@ -138,6 +156,52 @@ class ContactService {
       return response.statusCode == 200;
     } catch (e) {
       return false;
+    }
+  }
+  
+  /// Test the enquiry endpoint with a simple request
+  static Future<Map<String, dynamic>> testEnquiryEndpoint() async {
+    try {
+      final testPayload = {
+        'first_name': 'Test',
+        'last_name': 'User',
+        'email': 'test@example.com',
+        'phone_number': '+92 331 4554 742',
+        'company_name': 'Test Company',
+        'enquiry_type': 'General Inquiry',
+        'message': 'This is a test message',
+      };
+      
+      final jsonBody = jsonEncode(testPayload);
+      print('Testing enquiry endpoint: $_baseUrl$_enquiryEndpoint');
+      print('Test payload: $jsonBody');
+      
+      final response = await http.post(
+        Uri.parse('$_baseUrl$_enquiryEndpoint'),
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Accept': 'application/json',
+          'User-Agent': 'RGP-Landing-Form/1.0',
+        },
+        body: jsonBody,
+      ).timeout(const Duration(seconds: 10));
+      
+      print('Test response status: ${response.statusCode}');
+      print('Test response body: ${response.body}');
+      print('Test response headers: ${response.headers}');
+      
+      return {
+        'success': response.statusCode >= 200 && response.statusCode < 300,
+        'statusCode': response.statusCode,
+        'body': response.body,
+        'headers': response.headers,
+      };
+    } catch (e) {
+      print('Test error: $e');
+      return {
+        'success': false,
+        'error': e.toString(),
+      };
     }
   }
 }

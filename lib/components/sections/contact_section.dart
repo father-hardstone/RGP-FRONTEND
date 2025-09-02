@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:rgp_landing_take_3/components/sections/contact_text_section.dart';
 import 'package:rgp_landing_take_3/components/sections/contact_form_section.dart';
 import 'package:rgp_landing_take_3/constants/typography.dart';
@@ -18,25 +19,70 @@ class ContactSection extends StatefulWidget {
 }
 
 class _ContactSectionState extends State<ContactSection> with TickerProviderStateMixin {
-  late AnimationController _gradientController;
+  late AnimationController _breathingController1;
+  late AnimationController _breathingController2;
+  late AnimationController _breathingController3;
+  late Animation<double> _breathingAnimation1;
+  late Animation<double> _breathingAnimation2;
+  late Animation<double> _breathingAnimation3;
   bool _animationsInitialized = false;
 
   @override
   void initState() {
     super.initState();
     
-    // Initialize gradient controller for northern lights effect
-    _gradientController = AnimationController(
-      duration: const Duration(seconds: 8), // 8-second sweep
+    // Initialize multiple breathing controllers for northern lights effect
+    _breathingController1 = AnimationController(
+      duration: const Duration(seconds: 6),
       vsync: this,
-    )..repeat(); // Continuous northern lights effect
+    );
+    _breathingController2 = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    );
+    _breathingController3 = AnimationController(
+      duration: const Duration(seconds: 10),
+      vsync: this,
+    );
+    
+    // Create breathing animations with different curves
+    _breathingAnimation1 = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _breathingController1,
+      curve: Curves.easeInOut,
+    ));
+    
+    _breathingAnimation2 = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _breathingController2,
+      curve: Curves.easeInOut,
+    ));
+    
+    _breathingAnimation3 = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _breathingController3,
+      curve: Curves.easeInOut,
+    ));
+    
+    // Start all breathing animations
+    _breathingController1.repeat(reverse: true);
+    _breathingController2.repeat(reverse: true);
+    _breathingController3.repeat(reverse: true);
     
     _animationsInitialized = true;
   }
 
   @override
   void dispose() {
-    _gradientController.dispose();
+    _breathingController1.dispose();
+    _breathingController2.dispose();
+    _breathingController3.dispose();
     super.dispose();
   }
 
@@ -65,77 +111,100 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                 height: sectionHeight,
                 child: Stack(
                   children: [
-                    // Background with northern lights effect (covers entire section)
+                    // Static background gradient (no animation)
                     Positioned.fill(
-                      child: _animationsInitialized 
-                        ? AnimatedBuilder(
-                            animation: _gradientController,
-                            builder: (context, child) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Color(0xFF143877).withOpacity(0.35), // Blue at top
-                                      Color(0xFF1A4A8F).withOpacity(0.45), // Lighter blue in middle
-                                      Color(0xFF143877).withOpacity(0.35), // Blue
-                                      Color(0xFF143877).withOpacity(0.2), // Fading out
-                                      Color(0xFF143877).withOpacity(0.1), // More faded
-                                      Colors.transparent, // Completely transparent at bottom
-                                    ],
-                                    stops: [0.0, 0.3, 0.6, 0.8, 0.9, 1.0],
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xFF143877).withOpacity(0.4), // Blue at top
-                                  Color(0xFF143877).withOpacity(0.3), // Fading
-                                  Color(0xFF143877).withOpacity(0.2), // More faded
-                                  Color(0xFF143877).withOpacity(0.1), // Very faded
-                                  Colors.transparent, // Completely transparent at bottom
-                                ],
-                                stops: [0.0, 0.4, 0.7, 0.9, 1.0],
-                              ),
-                            ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF143877).withOpacity(0.15), // Blue at top
+                              Color(0xFF1A4A8F).withOpacity(0.2), // Lighter blue in middle
+                              Color(0xFF143877).withOpacity(0.15), // Blue
+                              Color(0xFF143877).withOpacity(0.1), // Fading out
+                              Color(0xFF143877).withOpacity(0.05), // More faded
+                              Colors.transparent, // Completely transparent at bottom
+                            ],
+                            stops: [0.0, 0.3, 0.6, 0.8, 0.9, 1.0],
                           ),
+                        ),
+                      ),
                     ),
                     
-                    // NEW: Additional spinning northern lights overlay for entire section
+                    // Northern Lights Breathing Effect - Layer 1 (TESTING - HIGH OPACITY)
                     Positioned.fill(
                       child: _animationsInitialized 
                         ? AnimatedBuilder(
-                            animation: _gradientController,
+                            animation: _breathingAnimation1,
                             builder: (context, child) {
                               return Container(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                     colors: [
-                                      Color(0xFF143877).withOpacity(0.15), // Darker end
-                                      Color(0xFF1A4A8F).withOpacity(0.25), // Lighter center
-                                      Color(0xFF1A4A8F).withOpacity(0.35), // Lighter center
-                                      Color(0xFF1A4A8F).withOpacity(0.25), // Lighter center
-                                      Color(0xFF143877).withOpacity(0.15), // Darker end
+                                      Color(0xFF1A4A8F).withOpacity(0.1 + (_breathingAnimation1.value * 0.2)),
+                                      Color(0xFF143877).withOpacity(0.05 + (_breathingAnimation1.value * 0.15)),
+                                      Colors.transparent,
                                     ],
-                                    stops: [0.05, 0.15,0.5,0.85, 0.95],
-                                    transform: GradientRotation(
-                                      _gradientController.value * 2 * 3.14159, // Full rotation
-                                    ),
+                                    stops: [0.0, 0.6, 1.0],
                                   ),
                                 ),
                               );
                             },
                           )
-                        : Container(), // Empty container when not initialized
+                        : Container(),
+                    ),
+                    
+                    // Northern Lights Breathing Effect - Layer 2 (TESTING - HIGH OPACITY)
+                    Positioned.fill(
+                      child: _animationsInitialized 
+                        ? AnimatedBuilder(
+                            animation: _breathingAnimation2,
+                            builder: (context, child) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topRight,
+                                    end: Alignment.bottomLeft,
+                                    colors: [
+                                      Colors.transparent,
+                                      Color(0xFF1A4A8F).withOpacity(0.05 + (_breathingAnimation2.value * 0.25)),
+                                      Color(0xFF143877).withOpacity(0.1 + (_breathingAnimation2.value * 0.2)),
+                                    ],
+                                    stops: [0.0, 0.4, 1.0],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Container(),
+                    ),
+                    
+                    // Northern Lights Breathing Effect - Layer 3 (TESTING - HIGH OPACITY)
+                    Positioned.fill(
+                      child: _animationsInitialized 
+                        ? AnimatedBuilder(
+                            animation: _breathingAnimation3,
+                            builder: (context, child) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    center: Alignment.center,
+                                    radius: 1.5,
+                                    colors: [
+                                      Color(0xFF1A4A8F).withOpacity(0.05 + (_breathingAnimation3.value * 0.15)),
+                                      Color(0xFF143877).withOpacity(0.03 + (_breathingAnimation3.value * 0.12)),
+                                      Colors.transparent,
+                                    ],
+                                    stops: [0.0, 0.7, 1.0],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Container(),
                     ),
                     
                     // Content on top of the northern lights
@@ -164,19 +233,45 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                                 Container(
                                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
                                   child: GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
                                       // Open GitHub profile in new tab
-                                      // Note: In web, this would need to be implemented with url_launcher
+                                      final Uri url = Uri.parse('https://github.com/father-hardstone');
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                                      }
                                     },
-                                    child: Text(
-                                      '© 2025 father_hardstone on GitHub. All rights reserved.',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.7),
-                                        fontSize: 16, // Increased font size from 14 to 16
-                                        fontWeight: FontWeight.bold, // Changed from w400 to bold
-                                        // decoration: TextDecoration.underline, // Removed underline
-                                      ),
+                                    child: RichText(
                                       textAlign: TextAlign.center,
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '© 2025 ',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.7),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: 'father-hardstone',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.9),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: Colors.white.withOpacity(0.7),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: ' on GitHub. All rights reserved.',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.7),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -204,19 +299,45 @@ class _ContactSectionState extends State<ContactSection> with TickerProviderStat
                               Container(
                                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
                                 child: GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
                                     // Open GitHub profile in new tab
-                                    // Note: In web, this would need to be implemented with url_launcher
+                                    final Uri url = Uri.parse('https://github.com/father-hardstone');
+                                    if (await canLaunchUrl(url)) {
+                                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                                    }
                                   },
-                                  child: Text(
-                                    '© 2025 father_hardstone on GitHub. All rights reserved.',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontSize: 16, // Increased font size from 14 to 16
-                                      fontWeight: FontWeight.bold, // Changed from w400 to bold
-                                                                              // decoration: TextDecoration.underline, // Removed underline
-                                    ),
+                                  child: RichText(
                                     textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '© 2025 ',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.7),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'father-hardstone',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                            decorationColor: Colors.white.withOpacity(0.7),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: ' on GitHub. All rights reserved.',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.7),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

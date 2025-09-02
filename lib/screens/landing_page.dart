@@ -5,6 +5,7 @@ import 'package:rgp_landing_take_3/components/sections/services_section.dart';
 import 'package:rgp_landing_take_3/components/sections/why_choose_us_section.dart';
 import 'package:rgp_landing_take_3/components/sections/about_us_section.dart';
 import 'package:rgp_landing_take_3/components/sections/contact_section.dart';
+
 import 'package:rgp_landing_take_3/utils/scroll_controller.dart';
 
 class LandingPage extends StatefulWidget {
@@ -17,6 +18,9 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final ScrollControllerHelper _scrollHelper = ScrollControllerHelper();
+  
+  // Demo tooltip state
+  bool _isDemoTooltipVisible = false;
   
   // Background animation controllers for both effects
   late AnimationController _initialZoomController; // For initial page load zoom-out
@@ -113,6 +117,13 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
       curve: Curves.easeInOut,
     );
   }
+  
+  // Handle demo tooltip visibility changes
+  void _onDemoTooltipVisibilityChanged(bool? isVisible) {
+    setState(() {
+      _isDemoTooltipVisible = isVisible ?? false;
+    });
+  }
 
   @override
   void dispose() {
@@ -163,23 +174,26 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
             builder: (context, constraints) {
               final bool isLargeScreen = constraints.maxWidth >= 1200;
               
-              return Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: isLargeScreen, // Only show on large screens
-                thickness: 8.0, // Thinner, more elegant scrollbar
-                radius: const Radius.circular(4.0), // Rounded corners
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  // Use ClampingScrollPhysics to prevent overscroll
-                  physics: const ClampingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
-                  ),
-                  slivers: <Widget>[
-                    // Main app bar (blue bar with title and contact button)
-                    MainAppBar(
-                      scrollController: _scrollController,
-                      scrollHelper: _scrollHelper,
-                    ),
+              return Stack(
+                children: [
+                  Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: isLargeScreen, // Only show on large screens
+                    thickness: 8.0, // Thinner, more elegant scrollbar
+                    radius: const Radius.circular(4.0), // Rounded corners
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      // Use ClampingScrollPhysics to prevent overscroll
+                      physics: const ClampingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                      slivers: <Widget>[
+                                            // Main app bar (blue bar with title and contact button)
+                        MainAppBar(
+                          scrollController: _scrollController,
+                          scrollHelper: _scrollHelper,
+                          onDemoTooltipVisibilityChanged: _onDemoTooltipVisibilityChanged,
+                        ),
                     
                     // Hero section
                     HeroSection(
@@ -200,12 +214,42 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
                       scrollController: _scrollController,
                     ),
                     
-                    // Contact section
-                                          ContactSection(
-                        scrollController: _scrollController,
+                        // Contact section
+                        ContactSection(
+                          scrollController: _scrollController,
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Demo tooltip positioned at left top under the app bar
+                  if (_isDemoTooltipVisible == true)
+                    Positioned(
+                      top: 90, // Right under the app bar with minimal top padding
+                      left: 8, // Minimal left padding
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        constraints: const BoxConstraints(maxWidth: 250),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1), // Close to transparent
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1.0,
+                          ),
+                        ),
+                        child: const Text(
+                          'This is a demo website showcasing RGP IT Global\'s services and capabilities. All contact information and inquiries are for demonstration purposes only.',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            height: 1.4,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               );
             },
           ),

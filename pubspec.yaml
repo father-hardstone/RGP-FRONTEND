@@ -43,6 +43,7 @@ dependencies:
   http: ^1.1.0
   visibility_detector: ^0.4.0+2
   responsive_builder: ^0.7.1
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+
+  
   # Background and main images
   - assets/bti5.webp
   - assets/bti7.jpg
@@ -88,6 +91,12 @@ flutter:
   # Service page images (infrastructure)
   # - assets/infrastructure_management/imbi2.webp
   - assets/infrastructure_management/imdp1.jpg
+  
+  # Icons
+  - assets/icons/RGP GLOBAL-IT.png
+  - assets/icons/RGP GLOBAL-IT black.png
+  - assets/icons/RGP GLOBAL-IT- mobile.png
+  - assets/icons/RGP GLOBAL-IT- mobile-black.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

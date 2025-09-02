@@ -31,8 +31,17 @@ class TopAppBar extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    // Scroll to About Us section
-                    scrollHelper.scrollToSection(scrollController, 1);
+                    // Ensure page lengths are calculated before scrolling
+                    if (scrollHelper.pl1 == 0) {
+                      // Recalculate page lengths if not done
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        scrollHelper.calculatePageLengths(context);
+                        scrollHelper.scrollToSection(scrollController, 1);
+                      });
+                    } else {
+                      // Use existing calculated lengths
+                      scrollHelper.scrollToSection(scrollController, 1);
+                    }
                   },
                   child: const Text(
                     'About Us',
